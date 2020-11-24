@@ -3,7 +3,7 @@ NVCC=nvcc
 
 intel:
 	mkdir -p bin
-
+	mkdir -p log
 	${CC} -O3 dgemv.c  \
 	-DUSE_INTEL -DUSE_DOUBLE \
 	-DMKL_ILP64 -m64 -I${MKLROOT}/include \
@@ -22,7 +22,7 @@ intel:
 
 nvidia:
 	mkdir -p bin
-
+	mkdir -p log
 	${NVCC} -O3 dgemv.c \
 	-DUSE_NVIDIA -DUSE_DOUBLE \
 	-o bin/nvidiadouble \
@@ -35,6 +35,6 @@ nvidia:
 
 amd:
 	mkdir -p bin
-
+	mkdir -p log
 
 all: intel nvidia amd

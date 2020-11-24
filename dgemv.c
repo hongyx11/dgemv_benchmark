@@ -55,28 +55,39 @@ void convert2flops(double *y, int arrlen, int m, int n){
   free(fy);
 }
 
-void saveresults(int m, int n, 
-double tmax, double tmin, double t50, double t25, double t75,
-double Pmean, double Bmean, char *type, char *filename){
-  char record[100];
-  memset(record, 0, sizeof(char)*100);
-#ifdef USE_DOUBLE
-  sprintf(record, "%d %d double %.3e %.3e %.3e %.3e %.3e %.3e %.3e %s\n", 
-  m, n, tmax, tmin, t50, t25, t75, Pmean, Bmean, type);
-#else
-  sprintf(record, "%d %d single %.3e %.3e %.3e %.3e %.3e %.3e %.3e %s\n", 
-  m, n, tmax, tmin, t50, t25, t75, Pmean, Bmean, type);
-#endif 
-  FILE *pf;
-  if( access(filename, F_OK) == -1){
-    pf = fopen(filename, "w");
-    char str[] = "m   n   precision FlopsMax FlopsMin Flops50th Flops25th Flops75th(GB/s) RelErr Bandwith(GB/s) ExpType \n";
-    fprintf(pf, "%s", str);
-    fprintf(pf, "%s", record);
-  }else{
-    pf = fopen(filename, "a");
-    fprintf(pf, "%s", record);
+void writestat(FILE *pf, double *y, int arrlen, char *desc){
+  fprintf(pf, "%s\n",desc);
+  for(int i=0; i<arrlen; i++){
+    fprintf(pf,"%.3e",y[i]);
+    if(i < arrlen-1) fprintf(pf," ","");
+    else fprintf(pf,"\n","");
   }
+}
+
+void saveresults(int m, int n, double *flopsarr, double *presstat, double *bandwithstat, int arrlen, char *type){
+  FILE *pf;
+  char filename[100];
+  memset(filename, 0, 100 * sizeof(char));
+#ifdef USE_DOUBLE
+  sprintf(filename, "log/M%dN%d_single_%s.txt", m, n, type);
+#else
+  sprintf(filename, "log/M%dN%d_single_%s.txt", m, n, type);
+#endif 
+  pf = fopen(filename, "w");
+  fprintf(pf, "M\n", "");
+  fprintf(pf, "%d\n", m);
+  fprintf(pf, "N\n", "");
+  fprintf(pf, "%d\n", n);
+  fprintf(pf, "%s\n", "Precision");
+#ifdef USE_DOUBLE
+  fprintf(pf, "double\n", "");
+#else
+  fprintf(pf, "single\n", "");
+#endif
+  writestat(pf, flopsarr, arrlen, "Flops");
+  writestat(pf, presstat, arrlen, "Relative Error");
+  writestat(pf, bandwithstat, arrlen, "Bandwith(GBytes/s)");
+  fprintf(pf, "Exptype\n%s\n",type);
   fclose(pf);
 }
 
@@ -345,13 +356,14 @@ for(int nr=0; nr<nruns+warmup; nr++){
   double timemean = mean(timestat, nruns);
   double timevar = var(timestat, nruns);
   csort(timestat, nruns);
+  convert2flops(timestat, nruns, m, n);
   double time50th = getquatile(timestat, 0.5, nruns);
   double time25th = getquatile(timestat, 0.25, nruns);
   double time75th = getquatile(timestat, 0.75, nruns);
   double timemax = timestat[nruns-1];
   double timemin = timestat[0];
   double presmean = mean(presstat, nruns);
-  saveresults(m,n,timemax, timemin, time50th, time25th, time75th, presmean, 0, exptype, filepath);
+  saveresults(m,n,timestat, nruns, exptype);
   printf (" 5) quick look at the test time mean (seconds) and var %.3e, %.3e. \n\n", timemean, timevar);
   printf (" 6) Deallocating memory and write results to files. \n\n");
 #endif
@@ -376,7 +388,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   double timemin = timestat[0];
   double presmean = mean(presstat, nruns);
   double bandmean = mean(bandwithstat, nruns);
-  saveresults(m,n,timemax, timemin, time50th, time25th, time75th, presmean, bandmean, exptype, filepath);
+  saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
   printf (" 5) quick look at the test time mean and var %.3e, %.3e. \n\n", timemean, timevar);
   printf (" 6) Deallocating memory and write results to files. \n\n");
 #endif 
