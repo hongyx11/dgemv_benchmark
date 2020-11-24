@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <memory.h>
+
 #ifdef USE_INTEL
 #include <mkl.h>
 #endif 
@@ -221,9 +222,6 @@ int main(int argc, const char* argv[])
   cudaError_t cudaStat;
   cublasStatus_t stat;
   cublasHandle_t handle;
-	cudaEvent_t start, stop;
-	cudaEventCreate(&start);
-	cudaEventCreate(&stop);
   real_t *d_A, *d_y, *d_x;
   // malloc device
   cudaStat = cudaMalloc ((void**)&d_A, m*n*sizeof(real_t));
@@ -283,35 +281,32 @@ for(int nr=0; nr<nruns+warmup; nr++){
 #ifdef USE_NVIDIA
 for(int nr=0; nr<nruns+warmup; nr++){
   float cpytime = 0.0, executime = 0.0, time = 0.0;
-  cudaEventRecord(start, 0);
+  double stime = gettime();
   cudaMemcpy(d_A, A, m * n * sizeof(real_t), cudaMemcpyDefault);
   cudaMemcpy(d_x, x, n * sizeof(real_t), cudaMemcpyDefault);
   cudaMemcpy(d_y, y, m * sizeof(real_t), cudaMemcpyDefault);
-  cudaEventRecord(stop, 0);
   cudaDeviceSynchronize();
-  time = 0.0;
-  cudaEventElapsedTime(&time, start, stop);
-  cpytime += time;
-  cudaEventRecord(start, 0);
-#ifdef USE_DOUBLE
-  cublasDgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
-#else 
-  cublasSgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
-#endif 
-  cudaEventRecord(stop, 0);
-  cudaEventSynchronize(stop);
-  time = 0.0;
-  cudaEventElapsedTime(&time, start, stop);
-  executime += time;
-  cudaEventRecord(start, 0);
+  double etime = gettime();
+  cpytime = etime - stime;
+  
+  stime = gettime();
+  sleep(4);
+// #ifdef USE_DOUBLE
+//   cublasDgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
+// #else 
+//   cublasSgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
+// #endif 
+  cudaDeviceSynchronize();
+  etime = gettime();
+  executime = etime-stime;
+
+  stime = gettime();
   cudaMemcpy(A, d_A, m * n * sizeof(real_t), cudaMemcpyDefault);
   cudaMemcpy(x, d_x, n * sizeof(real_t), cudaMemcpyDefault);
   cudaMemcpy(y, d_y, m * sizeof(real_t), cudaMemcpyDefault);
-  cudaEventRecord(stop, 0);
   cudaDeviceSynchronize();
-  time = 0.0;
-  cudaEventElapsedTime(&time, start, stop);
-  cpytime += time;
+  etime = gettime();
+  cpytime += etime-stime;
   if(nr < warmup) continue;
   timestat[nr-warmup] = executime;
   presstat[nr-warmup] = checkcorrectness(y,ynaive, m,n);
