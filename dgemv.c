@@ -59,8 +59,8 @@ void writestat(FILE *pf, double *y, int arrlen, char *desc){
   fprintf(pf, "%s\n",desc);
   for(int i=0; i<arrlen; i++){
     fprintf(pf,"%.3e",y[i]);
-    if(i < arrlen-1) fprintf(pf," ","");
-    else fprintf(pf,"\n","");
+    if(i < arrlen-1) fprintf(pf," ");
+    else fprintf(pf,"\n");
   }
 }
 
@@ -74,15 +74,15 @@ void saveresults(int m, int n, double *flopsarr, double *presstat, double *bandw
   sprintf(filename, "log/M%dN%d_single_%s.txt", m, n, type);
 #endif 
   pf = fopen(filename, "w");
-  fprintf(pf, "M\n", "");
+  fprintf(pf, "M\n");
   fprintf(pf, "%d\n", m);
-  fprintf(pf, "N\n", "");
+  fprintf(pf, "N\n");
   fprintf(pf, "%d\n", n);
   fprintf(pf, "%s\n", "Precision");
 #ifdef USE_DOUBLE
-  fprintf(pf, "double\n", "");
+  fprintf(pf, "double\n");
 #else
-  fprintf(pf, "single\n", "");
+  fprintf(pf, "single\n");
 #endif
   writestat(pf, flopsarr, arrlen, "Flops");
   writestat(pf, presstat, arrlen, "Relative Error");
@@ -362,7 +362,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   double timemax = timestat[nruns-1];
   double timemin = timestat[0];
   double presmean = mean(presstat, nruns);
-  saveresults(m,n,timestat, nruns, exptype);
+  saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
   printf (" 5) quick look at the test time mean (seconds) and var %.3e, %.3e. \n\n", timemean, timevar);
   printf (" 6) Deallocating memory and write results to files. \n\n");
 #endif
