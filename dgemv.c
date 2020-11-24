@@ -69,7 +69,7 @@ void saveresults(int m, int n, double *flopsarr, double *presstat, double *bandw
   char filename[100];
   memset(filename, 0, 100 * sizeof(char));
 #ifdef USE_DOUBLE
-  sprintf(filename, "log/M%dN%d_single_%s.txt", m, n, type);
+  sprintf(filename, "log/M%dN%d_double_%s.txt", m, n, type);
 #else
   sprintf(filename, "log/M%dN%d_single_%s.txt", m, n, type);
 #endif 
@@ -190,12 +190,11 @@ int main(int argc, const char* argv[])
   alpha = 1.0;
   beta = 0.0;
   if(strcmp(argv[1], "fixed") == 0){
-    assert(argc == 7);
+    assert(argc == 6);
     m = atoi(argv[2]);
     n = atoi(argv[3]);
     nruns = atoi(argv[4]);
     strcpy(exptype, argv[5]);
-    strcpy(filepath, argv[6]);
   }else if(strcmp(argv[1], "range") == 0){
     assert(argc == 6);
   }else{

@@ -13,4 +13,4 @@
 #SBATCH --constraint=cascadelake
 module load gcc/8.2.0
 module load intel/2020
-./bin/intelsingle.out fixed 1000 100 10 skylake res.txt
+source intel.sh
