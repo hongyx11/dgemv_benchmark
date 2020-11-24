@@ -1,3 +1,4 @@
+#!/bin/bash
 make intel
 CPUTYPE=$1
 
@@ -6,6 +7,7 @@ then
 echo "CPUTYPE not set. please try agin."
 exit
 fi
+
 
 ./bin/intelsingle fixed 128 128 100 ${CPUTYPE} 
 ./bin/intelsingle fixed 256 256 100 ${CPUTYPE} 
