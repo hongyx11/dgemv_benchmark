@@ -46,10 +46,10 @@ void csort(double *y, int arrlen){
 }
 
 
-void convert2flops(double *y, int arrlen, long m, long n){
+void convert2flops(double *y, int arrlen, int m, int n){
   double *fy = (double*)malloc(sizeof(double)*arrlen);
   for(int i=0; i<arrlen; i++){
-    fy[i] = (2.0 * m * n + 3 * m) / (y[i] * 1073741824.);
+    fy[i] = (2.0 * m * n + 3 * m) / (y[i] * 1.0e9);
   }
   memcpy(y,fy,sizeof(double)*arrlen);
   free(fy);
@@ -59,6 +59,7 @@ void saveresults(int m, int n,
 double tmax, double tmin, double t50, double t25, double t75,
 double Pmean, double Bmean, char *type, char *filename){
   char record[100];
+  memset(record, 0, sizeof(char)*100);
 #ifdef USE_DOUBLE
   sprintf(record, "%d %d double %.3e %.3e %.3e %.3e %.3e %.3e %.3e %s\n", 
   m, n, tmax, tmin, t50, t25, t75, Pmean, Bmean, type);
@@ -69,14 +70,13 @@ double Pmean, double Bmean, char *type, char *filename){
   FILE *pf;
   if( access(filename, F_OK) == -1){
     pf = fopen(filename, "w");
-    char str[] = "m   n   precision TimeMax(s) TimeMin(s) Time50th(s) Time25th(s) Time75Th(s) RelErr Bandwith(GB/s) ExpType\n";
-    fwrite(str,1,sizeof(str),pf);
+    char str[] = "m   n   precision FlopsMax FlopsMin Flops50th Flops25th Flops75th(GB/s) RelErr Bandwith(GB/s) ExpType \n";
+    fprintf(pf, "%s", str);
     fprintf(pf, "%s", record);
   }else{
     pf = fopen(filename, "a");
     fprintf(pf, "%s", record);
   }
-  
   fclose(pf);
 }
 
@@ -98,13 +98,14 @@ void naive_impl(real_t *A, real_t* x, real_t *y, int m, int n){
 }
 
 void Initdata_cpu(real_t *A, real_t* x, real_t *y, int m, int n){
-  memset(y, 0, sizeof(real_t) * n);
+  memset(y, 0, sizeof(real_t) * m);
   for(int i=0; i<n; i++){
     x[i] = (real_t)rand() / (real_t)RAND_MAX;
   }
   for(int i=0; i<m; i++){
     for(int j=0; j<n; j++){
-      A[i * n + j] = (real_t)rand() / (real_t)RAND_MAX;
+      long tmp = (long)i * (long)n + (long)j;
+      A[tmp] = (real_t)rand() / (real_t)RAND_MAX;
     }
   }
 }
@@ -241,6 +242,10 @@ int main(int argc, const char* argv[])
   checkcudaerror(cudaStat);
   cudaStat = cudaMalloc ((void**)&d_y, m*sizeof(real_t));
   checkcudaerror(cudaStat);
+  if (d_A == NULL || d_x == NULL || d_y == NULL) {
+    printf( "\n ERROR: Can't allocate memory for matrices. Aborting... \n\n");
+    return 1;
+  }
   stat = cublasCreate(&handle);
   checkcudastatus(stat);
   char machinename[150];
@@ -252,6 +257,7 @@ int main(int argc, const char* argv[])
   printf(" 2) use nvidia %s and single precision on %s.\n\n", exptype, machinename);
   #endif 
 #endif 
+
 
 
 /**
@@ -289,6 +295,8 @@ for(int nr=0; nr<nruns+warmup; nr++){
 }
 #endif 
 
+
+
 #ifdef USE_NVIDIA
 for(int nr=0; nr<nruns+warmup; nr++){
   float cpytime = 0.0, executime = 0.0, time = 0.0;
@@ -320,10 +328,9 @@ for(int nr=0; nr<nruns+warmup; nr++){
   if(nr < warmup) continue;
   timestat[nr-warmup] = executime;
   presstat[nr-warmup] = checkcorrectness(y,ynaive, m,n);
-  bandwithstat[nr-warmup] =  sizeof(real_t) * (m * n + m + n) * 2 / (cpytime * 1073741824.) ;
+  bandwithstat[nr-warmup] =  sizeof(real_t) * (m * n + m + n) * 2 / (cpytime * 1.0e9) ;
 }
 #endif
-
 
 
 
@@ -332,7 +339,6 @@ for(int nr=0; nr<nruns+warmup; nr++){
  * 
  */
 #ifdef USE_INTEL
-  
   mkl_free(A);
   mkl_free(x);
   mkl_free(y);
@@ -350,6 +356,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   printf (" 6) Deallocating memory and write results to files. \n\n");
 #endif
 
+
 #ifdef USE_NVIDIA
   free(A);
   free(x);
@@ -357,6 +364,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   cudaFree(d_A);
   cudaFree(d_x);
   cudaFree(d_y);
+  
   double timemean = mean(timestat, nruns);
   double timevar = var(timestat, nruns);
   csort(timestat, nruns);
@@ -372,7 +380,6 @@ for(int nr=0; nr<nruns+warmup; nr++){
   printf (" 5) quick look at the test time mean and var %.3e, %.3e. \n\n", timemean, timevar);
   printf (" 6) Deallocating memory and write results to files. \n\n");
 #endif 
-
 
   free(timestat);
   free(presstat);
