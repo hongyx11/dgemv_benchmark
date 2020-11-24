@@ -45,6 +45,16 @@ void csort(double *y, int arrlen){
   qsort(y, arrlen, sizeof(double), cmpfunc);
 }
 
+
+void convert2flops(double *y, int arrlen, long m, long n){
+  double *fy = (double*)malloc(sizeof(double)*arrlen);
+  for(int i=0; i<arrlen; i++){
+    fy[i] = (2.0 * m * n + 3 * m) / (y[i] * 1073741824.);
+  }
+  memcpy(y,fy,sizeof(double)*arrlen);
+  free(fy);
+}
+
 void saveresults(int m, int n, 
 double tmax, double tmin, double t50, double t25, double t75,
 double Pmean, double Bmean, char *type, char *filename){
@@ -135,6 +145,7 @@ double checkcorrectness(real_t *y, real_t *ynaive, int dim, int sumdim){
 }
 
 #ifdef USE_NVIDIA
+
 void checkcudaerror(cudaError_t st){
   if(st != cudaSuccess){
     printf("cuda status failed. \n");
@@ -349,6 +360,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   double timemean = mean(timestat, nruns);
   double timevar = var(timestat, nruns);
   csort(timestat, nruns);
+  convert2flops(timestat, nruns, m, n);
   double time50th = getquatile(timestat, 0.5, nruns);
   double time25th = getquatile(timestat, 0.25, nruns);
   double time75th = getquatile(timestat, 0.75, nruns);
