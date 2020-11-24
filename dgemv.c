@@ -290,12 +290,11 @@ for(int nr=0; nr<nruns+warmup; nr++){
   cpytime = etime - stime;
   
   stime = gettime();
-  sleep(4);
-// #ifdef USE_DOUBLE
-//   cublasDgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
-// #else 
-//   cublasSgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
-// #endif 
+#ifdef USE_DOUBLE
+  cublasDgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
+#else 
+  cublasSgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
+#endif 
   cudaDeviceSynchronize();
   etime = gettime();
   executime = etime-stime;
@@ -310,7 +309,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   if(nr < warmup) continue;
   timestat[nr-warmup] = executime;
   presstat[nr-warmup] = checkcorrectness(y,ynaive, m,n);
-  bandwithstat[nr-warmup] =  sizeof(real_t) * (m * n + m + n) * 2 / (cpytime * 1e-3 * 1073741824.) ;
+  bandwithstat[nr-warmup] =  sizeof(real_t) * (m * n + m + n) * 2 / (cpytime * 1073741824.) ;
 }
 #endif
 
