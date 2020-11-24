@@ -59,13 +59,14 @@ def boxplot(exptype):
   ax = sns.boxplot(x='N', y='flops_gbs', data=df[spidx],fliersize=3)
   singlefpmean = df[spidx].groupby('N').mean().flops_gbs.to_numpy()
   plt.plot(singlefpmean,label='SP,'+exptype)
-  ax = sns.boxplot(x='N', y='flops_gbs', data=df[df.pres=='double'],fliersize=3)
+  ax = sns.boxplot(x='N', y='flops_gbs', data=df[dpidx],fliersize=3)
   doublefpmean = df[dpidx].groupby('N').mean().flops_gbs.to_numpy()
   plt.plot(doublefpmean,label='DP,'+exptype)
   return ax
 # %%
 plt.figure(figsize=(4,3),dpi=150)
 ax = boxplot('V100')
+# ax = boxplot('P100')
 ax.xaxis.set_tick_params(labelsize=8)
 ax.yaxis.set_tick_params(labelsize=8)
 ax.set_xticklabels(labels=[str(int(x)) for x in sorted(set(df.N))])
@@ -74,4 +75,20 @@ plt.xlabel("M = N",fontsize=10)
 plt.ylabel("Gflop/s",fontsize=10)
 plt.legend(fontsize=8)
 plt.show()
+# %%
+plt.figure(figsize=(4,3),dpi=150)
+# ax = boxplot('V100')
+ax = boxplot('P100')
+ax.xaxis.set_tick_params(labelsize=8)
+ax.yaxis.set_tick_params(labelsize=8)
+ax.set_xticklabels(labels=[str(int(x)) for x in sorted(set(df.N))])
+plt.grid(True, 'both')
+plt.xlabel("M = N",fontsize=10)
+plt.ylabel("Gflop/s",fontsize=10)
+plt.legend(fontsize=8)
+plt.show()
+# %%
+
+
+df[(df.N == 8192) & (df.exptype=='P100') & (df.pres == 'single')].flops_gbs.to_numpy()
 # %%
