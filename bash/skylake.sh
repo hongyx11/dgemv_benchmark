@@ -8,6 +8,7 @@
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=yuxi.hong@kaust.edu.sa
 #SBATCH --time=1:00:00
+#SBATCH --mem=32G
 #SBATCH --threads-per-core=1
 #SBATCH --hint=nomultithread
 #SBATCH --constraint=skylake
