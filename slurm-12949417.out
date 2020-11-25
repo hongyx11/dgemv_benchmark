@@ -1,0 +1,230 @@
+GNU 8.2.0 is now loaded
+Intel Parallel Studio 2020 is now loaded
+Working Dir is /home/hongy0a/dgemv_benchmark
+mkdir -p bin
+mkdir -p log
+mkdir -p plots
+gcc -O3 dgemv.c  \
+-DUSE_INTEL -DUSE_DOUBLE \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/inteldouble \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv.c \
+-DUSE_INTEL \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/intelsingle \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 128 n: 128 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 2.439e-06, 2.766e-13. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 256 n: 256 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 7.069e-06, 8.426e-14. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 512 n: 512 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 2.385e-05, 6.501e-12. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 1024 n: 1024 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 1.658e-04, 1.040e-11. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 2048 n: 2048 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 6.638e-04, 2.007e-10. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 4096 n: 4096 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 4.191e-03, 1.030e-09. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 8192 n: 8192 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 2.406e-02, 1.176e-04. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 128 n: 128 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 1.044e-06, 4.568e-14. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 256 n: 256 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 6.671e-06, 2.262e-13. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 512 n: 512 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 8.866e-05, 7.679e-11. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 1024 n: 1024 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 3.398e-04, 1.410e-10. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 2048 n: 2048 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 1.642e-03, 1.362e-09. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 4096 n: 4096 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 9.879e-03, 2.782e-08. 
+
+ 6) Deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 8192 n: 8192 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn603-18-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) quick look at the test time mean (seconds) and var 4.576e-02, 1.893e-04. 
+
+ 6) Deallocating memory and write results to files. 
+
