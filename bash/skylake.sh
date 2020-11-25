@@ -14,3 +14,4 @@
 module load gcc/8.2.0
 module load intel/2020
 source /home/hongy0a/dgemv_benchmark/bash/intel.sh skylake
+source /home/hongy0a/dgemv_benchmark/bash/intel_transpose.sh skylake
