@@ -62,6 +62,7 @@ def baseplot(df, exptypes):
   c=['r','g','b']
   for idx,exp in enumerate(exptypes):
     if exp in set(df.exptype):
+      print('ploting ',exp)
       ax = boxplot(df,exp,c[idx])
   ax.xaxis.set_tick_params(labelsize=8)
   ax.yaxis.set_tick_params(labelsize=8)
@@ -69,36 +70,47 @@ def baseplot(df, exptypes):
   plt.grid(True, 'both')
   plt.xlabel("M = N",fontsize=10)
   plt.ylabel("Gflop/s",fontsize=10)
-  plt.legend(fontsize=8)
+  plt.legend(fontsize=7)
   plt.savefig("plots/{}.pdf".format("-".join(exptypes)),bbox_inches='tight')
   plt.show()
 
 # %%
 
-def plotnvidia():
+def plotnvidia(exptypes):
   df = pd.DataFrame()
   for f in os.listdir('log'):
-    if f.endswith('P100.txt') or f.endswith('V100.txt') or f.endswith('A100.txt'):
-      resmap = extractfile('log/'+f)
-      df = addmaptodf(df, resmap)
-  baseplot(df, ['P100','V100'])
-
+    for ep in exptypes:
+      if f.endswith(ep+'.txt'):
+        resmap = extractfile('log/'+f)
+        df = addmaptodf(df, resmap)
+  baseplot(df, exptypes)
 
 def plotamd():
   pass
 
 
-def plotintel():
+def plotintel(exptypes):
   df = pd.DataFrame()
   for f in os.listdir('log'):
-    if f.endswith('skylake.txt') or f.endswith('cascadelake.txt'):
-      resmap = extractfile('log/'+f)
-      df = addmaptodf(df, resmap)
-  baseplot(df, ['skylake','cascadelake'])
+    for ep in exptypes:
+      if f.endswith(ep + '.txt'):
+        resmap = extractfile('log/'+f)
+        df = addmaptodf(df, resmap)
+  baseplot(df, exptypes)
 
 
-# %%
-plotintel()
+vendor = sys.argv[1]
+exptypes = sys.argv[2:]
+print("genrating plots for ", vendor)
+
+print("exptype is ", exptypes)
+
+if vendor == 'intel':
+  plotintel(exptypes)
+elif vendor == 'amd':
+  plotamd(exptypes)
+elif vendor == 'nvidia':
+  plotnvidia(exptypes)
 
 # %%
 
