@@ -180,7 +180,7 @@ int main(int argc, const char* argv[])
  */
 
 #ifdef USE_INTEL
-  A = (real_t *)mkl_malloc( m*n*sizeof( real_t ), 64 );
+  A = (real_t *)mkl_malloc( (long)m*(long)n*sizeof( real_t ), 64 );
   x = (real_t *)mkl_malloc( n*sizeof( real_t ), 64 );
   y = (real_t *)mkl_malloc( m*sizeof( real_t ), 64 );
   ynaive = (real_t *)mkl_malloc( m*sizeof( real_t ), 64 );
@@ -205,7 +205,7 @@ int main(int argc, const char* argv[])
 #ifdef USE_NVIDIA 
   cudaSetDevice(0); 
   // malloc host 
-  A = (real_t *)malloc( m*n*sizeof( real_t ));
+  A = (real_t *)malloc( (long)m*(long)n*sizeof( real_t ));
   x = (real_t *)malloc( n*sizeof( real_t ));
   y = (real_t *)malloc( m*sizeof( real_t ));
   ynaive = (real_t *)malloc( m*sizeof( real_t ));
@@ -214,7 +214,7 @@ int main(int argc, const char* argv[])
   cublasHandle_t handle;
   real_t *d_A, *d_y, *d_x;
   // malloc device
-  cudaStat = cudaMalloc ((void**)&d_A, m*n*sizeof(real_t));
+  cudaStat = cudaMalloc ((void**)&d_A, (long)m*(long)n*sizeof(real_t));
   checkcudaerror(cudaStat);
   cudaStat = cudaMalloc ((void**)&d_x, n*sizeof(real_t));
   checkcudaerror(cudaStat);
