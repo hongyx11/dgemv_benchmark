@@ -315,9 +315,10 @@ for(int nr=0; nr<nruns+warmup; nr++){
   mkl_free(A);
   mkl_free(x);
   mkl_free(y);
-  double meanpres = mean(presstat,nruns);
+  
+  
   saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
-  printf (" 5) mean pres %.3e, deallocating memory and write results to files. \n\n", meanpres);
+  printf (" 5) Deallocating memory and write results to files. \n\n");
 #endif
 
 
@@ -328,9 +329,8 @@ for(int nr=0; nr<nruns+warmup; nr++){
   cudaFree(d_A);
   cudaFree(d_x);
   cudaFree(d_y);
-  double meanpres = mean(presstat,nruns);
   saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
-  printf (" 5) mean pres %.3e, deallocating memory and write results to files. \n\n", meanpres);
+  printf (" 5) Deallocating memory and write results to files. \n\n");
 #endif 
 
   free(timestat);

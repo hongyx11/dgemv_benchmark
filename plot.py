@@ -18,7 +18,7 @@ def extractfile(filename):
     resmap['pres'] = f.readline().strip('\n')
     f.readline()
     fplist = f.readline().strip('\n').split(' ')
-    resmap['flops_gbs'] = [float(x) for x in fplist]
+    resmap['time'] = [float(x) for x in fplist]
     f.readline()
     relist = f.readline().strip('\n').split(' ')
     resmap['relerr'] = [float(x) for x in relist]
@@ -32,47 +32,112 @@ def extractfile(filename):
 
 def addmaptodf(df, resmap):
   if df.empty:
-    df = pd.DataFrame({'M':[],'N':[],'pres':[],'flops_gbs':[],'relerr':[],'exptype':[]})
+    df = pd.DataFrame({'M':[],'N':[],'pres':[],'flops_gbs':[],
+    'relerr':[],'bandwith':[],'exptype':[]})
   for i in range(len(resmap['flops_gbs'])):
     m = resmap['M']
     n = resmap['N']
     pres = resmap['pres']
     exptype = resmap['exptype']
-    newrow = {'M':m,'N':n,'pres':pres,'flops_gbs':resmap['flops_gbs'][i],
-    'relerr':resmap['relerr'][i],'exptype':exptype}
+    fps = resmap['flops_gbs'][i]
+    abstime = (2.0 * m * n + 3 * m) / (fps * 1.0e9)
+    bd = resmap['bd'][i]
+    newrow = {'M':m,'N':n,'pres':pres,'flops_gbs': fps,
+    'relerr':resmap['relerr'][i],'bandwith':bd,'exptype':exptype}
     df = df.append(newrow,ignore_index=True)
   return df
 
-def boxplot(df, exptype,c='r'):
+# def boxplot(df, exptype,c='r'):
+#   spidx = (df.pres == 'single') & (df.exptype == exptype)
+#   dpidx = (df.pres == 'double') & (df.exptype == exptype)
+#   ax = sns.boxplot(x='N', y='flops_gbs', data=df[spidx],fliersize=1,width=0.2,color='skyblue')
+#   singlefpmean = df[spidx].groupby('N').median().flops_gbs.to_numpy()
+#   plt.plot(singlefpmean,label='SP,'+exptype,color=c,linestyle='-',marker='.')
+#   ax = sns.boxplot(x='N', y='flops_gbs', data=df[dpidx],fliersize=1,width=0.2,color='magenta')
+#   doublefpmean = df[dpidx].groupby('N').median().flops_gbs.to_numpy()
+#   plt.plot(doublefpmean,label='DP,'+exptype,color=c, linestyle='--',marker='.')
+#   return ax
 
+# def baseplot(df, exptypes):
+#   plt.figure(figsize=(4,3),dpi=150)
+#   c=['r','g','b']
+#   for idx,exp in enumerate(exptypes):
+#     if exp in set(df.exptype):
+#       print('ploting ',exp)
+#       ax = boxplot(df,exp,c[idx])
+#   ax.xaxis.set_tick_params(labelsize=8)
+#   ax.yaxis.set_tick_params(labelsize=8)
+#   ax.set_xticklabels(labels=[str(int(x)) for x in sorted(set(df.N))])
+#   plt.grid(True, 'both')
+#   plt.xlabel("M = N",fontsize=10)
+#   plt.ylabel("Gflop/s",fontsize=10)
+#   plt.legend(fontsize=7)
+#   plt.savefig("plots/{}_gflops.pdf".format("-".join(exptypes)),bbox_inches='tight')
+#   plt.show()
+
+
+def timeplot(df, exptype,c='r'):
   spidx = (df.pres == 'single') & (df.exptype == exptype)
   dpidx = (df.pres == 'double') & (df.exptype == exptype)
-  ax = sns.boxplot(x='N', y='flops_gbs', data=df[spidx],fliersize=1,width=0.2)
-  singlefpmean = df[spidx].groupby('N').mean().flops_gbs.to_numpy()
-  plt.plot(singlefpmean,label='SP,'+exptype,color=c,linestyle='-')
-  ax = sns.boxplot(x='N', y='flops_gbs', data=df[dpidx],fliersize=1,width=0.2)
-  doublefpmean = df[dpidx].groupby('N').mean().flops_gbs.to_numpy()
-  plt.plot(doublefpmean,label='DP,'+exptype,color=c, linestyle='--')
+  ax = sns.boxplot(x='N', y='abstime', data=df[spidx],fliersize=1,width=0.2,color='skyblue')
+  singlefpmean = df[spidx].groupby('N').median().abstime.to_numpy()
+  plt.plot(singlefpmean,label='SP,'+exptype,color=c,linestyle='-',marker='.')
+  ax = sns.boxplot(x='N', y='abstime', data=df[dpidx],fliersize=1,width=0.2,color='magenta')
+  doublefpmean = df[dpidx].groupby('N').median().abstime.to_numpy()
+  plt.plot(doublefpmean,label='DP,'+exptype,color=c, linestyle='--',marker='.')
   return ax
 
-
-
-def baseplot(df, exptypes):
+def basetmplot(df, exptypes):
   plt.figure(figsize=(4,3),dpi=150)
   c=['r','g','b']
   for idx,exp in enumerate(exptypes):
     if exp in set(df.exptype):
       print('ploting ',exp)
-      ax = boxplot(df,exp,c[idx])
+      ax = timeplot(df,exp,c[idx])
   ax.xaxis.set_tick_params(labelsize=8)
   ax.yaxis.set_tick_params(labelsize=8)
   ax.set_xticklabels(labels=[str(int(x)) for x in sorted(set(df.N))])
   plt.grid(True, 'both')
   plt.xlabel("M = N",fontsize=10)
-  plt.ylabel("Gflop/s",fontsize=10)
+  plt.ylabel("Time(s)",fontsize=10)
   plt.legend(fontsize=7)
-  plt.savefig("plots/{}.pdf".format("-".join(exptypes)),bbox_inches='tight')
+  plt.yscale('log')
+  plt.savefig("plots/{}_time.pdf".format("-".join(exptypes)),bbox_inches='tight')
   plt.show()
+
+
+def bandplot(df, exptype,c='r'):
+  spidx = (df.pres == 'single') & (df.exptype == exptype)
+  dpidx = (df.pres == 'double') & (df.exptype == exptype)
+  ax = sns.boxplot(x='N', y='bandwith', data=df[spidx],fliersize=1,width=0.2,color='skyblue')
+  singlefpmean = df[spidx].groupby('N').median().bandwith.to_numpy()
+  plt.plot(singlefpmean,label='SP,'+exptype,color=c,linestyle='-',marker='.')
+  ax = sns.boxplot(x='N', y='bandwith', data=df[dpidx],fliersize=1,width=0.2,color='magenta')
+  doublefpmean = df[dpidx].groupby('N').median().bandwith.to_numpy()
+  plt.plot(doublefpmean,label='DP,'+exptype,color=c, linestyle='--',marker='.')
+  return ax
+
+def basebandplot(df, exptypes):
+  plt.figure(figsize=(4,3),dpi=150)
+  c=['r','g','b']
+  for idx,exp in enumerate(exptypes):
+    if exp in set(df.exptype):
+      print('ploting ',exp)
+      ax = bandplot(df,exp,c[idx])
+  ax.xaxis.set_tick_params(labelsize=8)
+  ax.yaxis.set_tick_params(labelsize=8)
+  ax.set_xticklabels(labels=[str(int(x)) for x in sorted(set(df.N))])
+  plt.grid(True, 'both')
+  plt.xlabel("M = N",fontsize=10)
+  plt.ylabel("Bandwith(GB/s)",fontsize=10)
+  plt.legend(fontsize=7)
+  plt.savefig("plots/{}_bandwith.pdf".format("-".join(exptypes)),bbox_inches='tight')
+  plt.show()
+
+
+#%%
+
+
 
 # %%
 
@@ -83,7 +148,9 @@ def plotnvidia(exptypes):
       if f.endswith(ep+'.txt'):
         resmap = extractfile('log/'+f)
         df = addmaptodf(df, resmap)
-  baseplot(df, exptypes)
+  baseplot(df, ['P100','V100'])
+  basetmplot(df,['P100','V100'])
+  basebandplot(df, ['P100','V100'])
 
 def plotamd():
   pass
@@ -97,7 +164,10 @@ def plotintel(exptypes):
         resmap = extractfile('log/'+f)
         df = addmaptodf(df, resmap)
   baseplot(df, exptypes)
+  basetmplot(df,exptypes)
 
+
+# plotnvidia(['P100','V100'])
 
 vendor = sys.argv[1]
 exptypes = sys.argv[2:]

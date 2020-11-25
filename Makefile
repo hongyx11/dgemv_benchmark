@@ -35,6 +35,16 @@ nvidia:
 	-o bin/nvidiasingle \
 	-I${CUDAROOT}/include -L${CUDAROOT}/lib64 -lcublas -lcudart 
 
+	${NVCC} -O3 dgemv_transpose.c \
+	-DUSE_NVIDIA -DUSE_DOUBLE \
+	-o bin/nvidiadouble_transpose \
+	-I${CUDAROOT}/include -L${CUDAROOT}/lib64 -lcublas -lcudart 
+
+	${NVCC} -g -O3 dgemv_transpose.c \
+	-DUSE_NVIDIA \
+	-o bin/nvidiasingle_transpose \
+	-I${CUDAROOT}/include -L${CUDAROOT}/lib64 -lcublas -lcudart 
+
 amd:
 	mkdir -p bin
 	mkdir -p log

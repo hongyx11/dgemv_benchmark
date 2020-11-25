@@ -37,14 +37,22 @@ int min(int a, int b){
   return b;
 }
 
-double mean(double *y, int dim){
-  double ret = 0.0;
-  #pragma omp parallel for
-  for(int i=0; i<dim; i++){
-    ret += y[i];
+int cmpfunc (const void * a, const void * b) {
+   return ( *(double*)a - *(double*)b );
+}
+
+void csort(double *y, int arrlen){
+  qsort(y, arrlen, sizeof(double), cmpfunc);
+}
+
+
+void convert2flops(double *y, int arrlen, int m, int n){
+  double *fy = (double*)malloc(sizeof(double)*arrlen);
+  for(int i=0; i<arrlen; i++){
+    fy[i] = (2.0 * m * n + 3 * m) / (y[i] * 1.0e9);
   }
-  ret /= dim;
-  return ret;
+  memcpy(y,fy,sizeof(double)*arrlen);
+  free(fy);
 }
 
 void writestat(FILE *pf, double *y, int arrlen, char *desc){
@@ -56,7 +64,7 @@ void writestat(FILE *pf, double *y, int arrlen, char *desc){
   }
 }
 
-void saveresults(int m, int n, double *timearr, double *presstat, double *bandwithstat, int arrlen, char *type){
+void saveresults(int m, int n, double *flopsarr, double *presstat, double *bandwithstat, int arrlen, char *type){
   FILE *pf;
   char filename[100];
   memset(filename, 0, 100 * sizeof(char));
@@ -76,7 +84,7 @@ void saveresults(int m, int n, double *timearr, double *presstat, double *bandwi
 #else
   fprintf(pf, "single\n");
 #endif
-  writestat(pf, timearr, arrlen, "Time");
+  writestat(pf, flopsarr, arrlen, "Flops");
   writestat(pf, presstat, arrlen, "Relative Error");
   writestat(pf, bandwithstat, arrlen, "Bandwith(GBytes/s)");
   fprintf(pf, "Exptype\n%s\n",type);
@@ -113,6 +121,30 @@ void Initdata_cpu(real_t *A, real_t* x, real_t *y, int m, int n){
   }
 }
 
+double mean(double *y, int dim){
+  double ret = 0.0;
+  #pragma omp parallel for
+  for(int i=0; i<dim; i++){
+    ret += y[i];
+  }
+  ret /= dim;
+  return ret;
+}
+
+double var(double *y, int dim){
+  double mval = mean(y, dim);
+  double s = 0.0;
+  #pragma omp parallel for
+  for(int i=0; i<dim; i++){
+    s += (mval - y[i]) * (mval - y[i]);
+  }
+  s /= (dim - 1);
+  return s;
+}
+
+double getquatile(double *y, double percent, int dim){
+  return y[(int)(dim*percent)];
+}
 
 double checkcorrectness(real_t *y, real_t *ynaive, int dim, int sumdim){
   double *rerr = (double*)malloc(sizeof(double)*dim);
@@ -199,7 +231,7 @@ int main(int argc, const char* argv[])
   printf(" 2) use intel, mkl use %d threads and double precision on %s.\n\n", threads, machinename);
   #else
   printf(" 2) use intel, mkl use %d threads and single precision on %s.\n\n", threads, machinename);
-  #endif
+  #endif 
 #endif 
 
 #ifdef USE_NVIDIA 
@@ -258,8 +290,7 @@ int main(int argc, const char* argv[])
  */
 #ifdef USE_INTEL  
 for(int nr=0; nr<nruns+warmup; nr++){
-  double stime = 0.0, etime = 0.0, executiontime = 0.0;
-  stime = gettime();
+  double stime = gettime();
 #ifdef USE_DOUBLE
   cblas_dgemv(CblasColMajor, CblasNoTrans, 
     m, n, alpha, A, m, x, 1, beta, y, 1);
@@ -267,11 +298,9 @@ for(int nr=0; nr<nruns+warmup; nr++){
   cblas_sgemv(CblasColMajor, CblasNoTrans, 
     m, n, alpha, A, m, x, 1, beta, y, 1);
 #endif 
-  etime = gettime();
+  double etime = gettime();
   if(nr < warmup) continue;
-  executiontime = etime - stime;
-  timestat[nr-warmup] = executiontime;
-  bandwithstat[nr-warmup] = sizeof(real_t)*(m*n+m+n)/(executiontime * 1e9);
+  timestat[nr-warmup] = etime - stime;
   presstat[nr-warmup] = checkcorrectness(y,ynaive, m,n);
 }
 #endif 
@@ -280,11 +309,14 @@ for(int nr=0; nr<nruns+warmup; nr++){
 
 #ifdef USE_NVIDIA
 for(int nr=0; nr<nruns+warmup; nr++){
-  double stime = 0.0, etime = 0.0, executiontime = 0.0;
-  cudaMemcpy(d_A, A, m * n * sizeof(real_t), cudaMemcpyDefault);
+  float cpytime = 0.0, executime = 0.0, time = 0.0;
+  double stime = gettime();
+  cudaMemcpy(d_A, A, m * n * sizeof(real_t), cudaMemcpyDefault); // m * n
   cudaMemcpy(d_x, x, n * sizeof(real_t), cudaMemcpyDefault);
   cudaMemcpy(d_y, y, m * sizeof(real_t), cudaMemcpyDefault);
   cudaDeviceSynchronize();
+  double etime = gettime();
+  cpytime = etime - stime;
   stime = gettime();
 #ifdef USE_DOUBLE
   cublasDgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
@@ -293,15 +325,19 @@ for(int nr=0; nr<nruns+warmup; nr++){
 #endif 
   cudaDeviceSynchronize();
   etime = gettime();
-  executiontime = etime-stime;
+  executime = etime-stime;
+
+  stime = gettime();
   cudaMemcpy(A, d_A, m * n * sizeof(real_t), cudaMemcpyDefault);
   cudaMemcpy(x, d_x, n * sizeof(real_t), cudaMemcpyDefault);
   cudaMemcpy(y, d_y, m * sizeof(real_t), cudaMemcpyDefault);
   cudaDeviceSynchronize();
+  etime = gettime();
+  cpytime += etime-stime;
   if(nr < warmup) continue;
-  timestat[nr-warmup] = executiontime;
-  bandwithstat[nr-warmup] =  sizeof(real_t)*(m*n+m+n)/(executiontime * 1.0e9) ; 
+  timestat[nr-warmup] = executime;
   presstat[nr-warmup] = checkcorrectness(y,ynaive, m,n);
+  bandwithstat[nr-warmup] =  sizeof(real_t) * (m * n + m + n) * 2 / (executime * 1.0e9) ; // GBytes / s 
 }
 #endif
 
@@ -315,9 +351,14 @@ for(int nr=0; nr<nruns+warmup; nr++){
   mkl_free(A);
   mkl_free(x);
   mkl_free(y);
-  double meanpres = mean(presstat,nruns);
+  double timemean = mean(timestat, nruns);
+  double timevar = var(timestat, nruns);
+  csort(timestat, nruns);
+  convert2flops(timestat, nruns, m, n);
+  double presmean = mean(presstat, nruns);
   saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
-  printf (" 5) mean pres %.3e, deallocating memory and write results to files. \n\n", meanpres);
+  printf (" 5) quick look at the test time mean (seconds) and var %.3e, %.3e. \n\n", timemean, timevar);
+  printf (" 6) Deallocating memory and write results to files. \n\n");
 #endif
 
 
@@ -328,9 +369,21 @@ for(int nr=0; nr<nruns+warmup; nr++){
   cudaFree(d_A);
   cudaFree(d_x);
   cudaFree(d_y);
-  double meanpres = mean(presstat,nruns);
+  
+  double timemean = mean(timestat, nruns);
+  double timevar = var(timestat, nruns);
+  csort(timestat, nruns);
+  convert2flops(timestat, nruns, m, n);
+  double time50th = getquatile(timestat, 0.5, nruns);
+  double time25th = getquatile(timestat, 0.25, nruns);
+  double time75th = getquatile(timestat, 0.75, nruns);
+  double timemax = timestat[nruns-1];
+  double timemin = timestat[0];
+  double presmean = mean(presstat, nruns);
+  double bandmean = mean(bandwithstat, nruns);
   saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
-  printf (" 5) mean pres %.3e, deallocating memory and write results to files. \n\n", meanpres);
+  printf (" 5) quick look at the test time mean and var %.3e, %.3e. \n\n", timemean, timevar);
+  printf (" 6) Deallocating memory and write results to files. \n\n");
 #endif 
 
   free(timestat);

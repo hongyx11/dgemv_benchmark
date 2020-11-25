@@ -8,57 +8,32 @@ echo "CPUTYPE not set. please try agin."
 exit
 fi
 
+# no transpose 
+./bin/intelsingle fixed 5000 10000 100 ${CPUTYPE} 
+./bin/intelsingle fixed 5000 25000 100 ${CPUTYPE} 
+# ./bin/intelsingle fixed 5000 20000 100 ${CPUTYPE} 
+# ./bin/intelsingle fixed 8000 80000 100 ${CPUTYPE} 
+# ./bin/intelsingle fixed 35000 70000 100 ${CPUTYPE} 
 
-./bin/intelsingle fixed 128 128 100 ${CPUTYPE} 
-./bin/intelsingle fixed 256 256 100 ${CPUTYPE} 
-./bin/intelsingle fixed 512 512 100 ${CPUTYPE} 
-./bin/intelsingle fixed 1024 1024 100 ${CPUTYPE} 
-./bin/intelsingle fixed 2048 2048 100 ${CPUTYPE} 
-./bin/intelsingle fixed 4096 4096 100 ${CPUTYPE} 
-./bin/intelsingle fixed 8192 8192 100 ${CPUTYPE} 
-
-
-# ./bin/intelsingle fixed 128 10000 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 256 10000 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 512 10000 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 1024 10000 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 2048 10000 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 4096 10000 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 8192 10000 100 ${CPUTYPE} 
+# # no transpose 
+# ./bin/inteldouble fixed 5000 10000 100 ${CPUTYPE} 
+# ./bin/inteldouble fixed 5000 25000 100 ${CPUTYPE} 
+# ./bin/inteldouble fixed 5000 20000 100 ${CPUTYPE} 
+# ./bin/inteldouble fixed 8000 80000 100 ${CPUTYPE} 
+# ./bin/inteldouble fixed 35000 700000 100 ${CPUTYPE} 
 
 
-# ./bin/intelsingle fixed 10000 128 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 10000 256 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 10000 512 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 10000 1024 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 10000 2048 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 10000 4096 100 ${CPUTYPE} 
-# ./bin/intelsingle fixed 10000 8192 100 ${CPUTYPE} 
+# # transpose
+# ./bin/intelsingle_transpose fixed 10000 5000 100 ${CPUTYPE} 
+# ./bin/intelsingle_transpose fixed 25000 5000 100 ${CPUTYPE} 
+# ./bin/intelsingle_transpose fixed 20000 5000 100 ${CPUTYPE} 
+# ./bin/intelsingle_transpose fixed 80000 8000 100 ${CPUTYPE} 
+# ./bin/intelsingle_transpose fixed 700000 35000 100 ${CPUTYPE} 
 
 
-
-./bin/inteldouble fixed 128 128 100 ${CPUTYPE} 
-./bin/inteldouble fixed 256 256 100 ${CPUTYPE} 
-./bin/inteldouble fixed 512 512 100 ${CPUTYPE} 
-./bin/inteldouble fixed 1024 1024 100 ${CPUTYPE} 
-./bin/inteldouble fixed 2048 2048 100 ${CPUTYPE} 
-./bin/inteldouble fixed 4096 4096 100 ${CPUTYPE} 
-./bin/inteldouble fixed 8192 8192 100 ${CPUTYPE} 
-
-
-# ./bin/inteldouble fixed 128 10000 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 256 10000 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 512 10000 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 1024 10000 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 2048 10000 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 4096 10000 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 8192 10000 100 ${CPUTYPE} 
-
-
-# ./bin/inteldouble fixed 10000 128 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 10000 256 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 10000 512 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 10000 1024 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 10000 2048 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 10000 4096 100 ${CPUTYPE} 
-# ./bin/inteldouble fixed 10000 8192 100 ${CPUTYPE} 
+# # transpose
+# ./bin/inteldouble_transpose fixed 10000 5000 100 ${CPUTYPE} 
+# ./bin/inteldouble_transpose fixed 25000 5000 100 ${CPUTYPE} 
+# ./bin/inteldouble_transpose fixed 20000 5000 100 ${CPUTYPE} 
+# ./bin/inteldouble_transpose fixed 80000 8000 100 ${CPUTYPE} 
+# ./bin/inteldouble_transpose fixed 700000 35000 100 ${CPUTYPE} 
