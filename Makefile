@@ -1,7 +1,6 @@
-CC=gcc
-NVCC=nvcc
 
 intel:
+	CC=gcc
 	mkdir -p bin
 	mkdir -p log
 	mkdir -p plots
@@ -37,7 +36,36 @@ intel:
 	${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a \
 	-Wl,--end-group -lgomp -lpthread -lm -ldl
 
+
+nec:
+	. /opt/nec/ve/nlc/2.1.0/bin/nlcvars.sh
+	mkdir -p bin
+	mkdir -p log
+	mkdir -p plots
+	ncc -O3 dgemv.c  \
+	-DUSE_NEC -DUSE_DOUBLE \
+	-o bin/necdouble \
+	-lcblas -fopenmp -lblas_openmp
+
+	ncc -O3 dgemv.c \
+	-DUSE_NEC \
+	-o bin/necsingle \
+	-lcblas -fopenmp -lblas_openmp
+
+	ncc -O3 dgemv_transpose.c  \
+	-DUSE_NEC -DUSE_DOUBLE \
+	-o bin/necdouble_transpose \
+	-lcblas -fopenmp -lblas_openmp
+
+	ncc -O3 dgemv_transpose.c \
+	-DUSE_NEC \
+	-o bin/necsingle_transpose \
+	-lcblas -fopenmp -lblas_openmp
+
+
 nvidia:
+	CC=gcc
+	NVCC=nvcc
 	mkdir -p bin
 	mkdir -p log
 	mkdir -p plots
@@ -66,4 +94,4 @@ amd:
 	mkdir -p log
 	mkdir -p plots
 
-all: intel nvidia amd
+all: intel nvidia amd nec

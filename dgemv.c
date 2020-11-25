@@ -22,8 +22,8 @@
 #include <cublas_v2.h>
 #endif
 
-#ifdef USE_AMD
-
+#if defined(USE_NEC) || defined(USE_AMD)
+#include <cblas.h>
 #endif
 
 #ifdef USE_DOUBLE
@@ -202,6 +202,31 @@ int main(int argc, const char* argv[])
   #endif
 #endif 
 
+
+#if defined(USE_NEC) || defined(USE_AMD)
+  // malloc host 
+  A = (real_t *)malloc( (long)m*(long)n*sizeof( real_t ));
+  x = (real_t *)malloc( (long)n*sizeof( real_t ));
+  y = (real_t *)malloc( (long)m*sizeof( real_t ));
+  ynaive = (real_t *)malloc( (long)m*sizeof( real_t ));
+  if (A == NULL || x == NULL || y == NULL) {
+    printf( "\n ERROR: Can't allocate memory for matrices. Aborting... \n\n");
+    free(A);
+    free(x);
+    free(y);
+    return 1;
+  }
+  int threads = omp_get_max_threads();
+  char machinename[150];
+  memset(machinename, 0, 150);
+  gethostname(machinename,150);
+  #ifdef USE_DOUBLE
+  printf(" 2) use nec, nlc use %d threads and double precision on %s.\n\n", threads, machinename);
+  #else
+  printf(" 2) use nec, nlc use %d threads and single precision on %s.\n\n", threads, machinename);
+  #endif
+#endif 
+
 #ifdef USE_NVIDIA 
   cudaSetDevice(0); 
   // malloc host 
@@ -256,7 +281,7 @@ int main(int argc, const char* argv[])
  * @brief gemv various interface.
  * 
  */
-#ifdef USE_INTEL  
+#if defined(USE_INTEL) || defined(USE_NEC) || defined(USE_AMD)
 for(int nr=0; nr<nruns+warmup; nr++){
   double stime = 0.0, etime = 0.0, executiontime = 0.0;
   stime = gettime();
@@ -320,6 +345,14 @@ for(int nr=0; nr<nruns+warmup; nr++){
   printf (" 5) mean precision: %.3e, deallocating memory and write results to files. \n\n", meanpres);
 #endif
 
+#if defined(USE_NEC) || defined(USE_AMD)
+  free(A);
+  free(x);
+  free(y);
+  double meanpres = mean(presstat,nruns);
+  saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
+  printf (" 5) mean precision: %.3e, deallocating memory and write results to files. \n\n", meanpres);
+#endif
 
 #ifdef USE_NVIDIA
   free(A);
