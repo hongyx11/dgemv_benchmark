@@ -1,0 +1,273 @@
+GNU 8.2.0 is now loaded
+Intel Parallel Studio 2020 is now loaded
+Working Dir is /home/hongy0a/dgemv_benchmark
+mkdir -p bin
+mkdir -p log
+mkdir -p plots
+gcc -O3 dgemv.c  \
+-DUSE_INTEL -DUSE_DOUBLE \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/inteldouble \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv.c \
+-DUSE_INTEL \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/intelsingle \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv_transpose.c  \
+-DUSE_INTEL -DUSE_DOUBLE \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/inteldouble_transpose \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv_transpose.c \
+-DUSE_INTEL \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/intelsingle_transpose \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 10000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and single precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 1.223e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 20000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and single precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 1.753e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 25000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and single precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 1.889e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 8000 n: 80000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and single precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 3.714e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 10000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and double precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 2.297e-15, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 20000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and double precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 3.248e-15, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 25000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and double precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 3.486e-15, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 8000 n: 80000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and double precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 6.452e-15, deallocating memory and write results to files. 
+
+mkdir -p bin
+mkdir -p log
+mkdir -p plots
+gcc -O3 dgemv.c  \
+-DUSE_INTEL -DUSE_DOUBLE \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/inteldouble \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv.c \
+-DUSE_INTEL \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/intelsingle \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv_transpose.c  \
+-DUSE_INTEL -DUSE_DOUBLE \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/inteldouble_transpose \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv_transpose.c \
+-DUSE_INTEL \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/intelsingle_transpose \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 10000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and single precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 1.224e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 25000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and single precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 1.884e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 20000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and single precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 1.696e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 80000 n: 8000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and single precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 3.728e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 10000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and double precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 2.279e-15, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 25000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and double precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 3.548e-15, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 20000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and double precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 3.260e-15, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 80000 n: 8000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 40 threads and double precision on cn509-29-l.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 6.610e-15, deallocating memory and write results to files. 
+
