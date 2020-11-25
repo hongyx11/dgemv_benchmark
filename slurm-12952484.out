@@ -1,0 +1,226 @@
+GNU 8.2.0 is now loaded
+Intel Parallel Studio 2020 is now loaded
+Working Dir is /home/hongy0a/dgemv_benchmark
+mkdir -p bin
+mkdir -p log
+mkdir -p plots
+gcc -O3 dgemv.c  \
+-DUSE_INTEL -DUSE_DOUBLE \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/inteldouble \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv.c \
+-DUSE_INTEL \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/intelsingle \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv_transpose.c  \
+-DUSE_INTEL -DUSE_DOUBLE \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/inteldouble_transpose \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv_transpose.c \
+-DUSE_INTEL \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/intelsingle_transpose \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 10000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 1.223e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 20000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 1.747e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 25000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 1.866e-06, deallocating memory and write results to files. 
+
+/home/hongy0a/dgemv_benchmark/bash/intel.sh: line 15: 114915 Killed                  ./bin/intelsingle fixed 8000 80000 100 ${CPUTYPE}
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 10000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 5.617e-17, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 20000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 5.764e-17, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 5000 n: 25000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision: 5.356e-17, deallocating memory and write results to files. 
+
+/home/hongy0a/dgemv_benchmark/bash/intel.sh: line 22: 115025 Killed                  ./bin/inteldouble fixed 8000 80000 100 ${CPUTYPE}
+mkdir -p bin
+mkdir -p log
+mkdir -p plots
+gcc -O3 dgemv.c  \
+-DUSE_INTEL -DUSE_DOUBLE \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/inteldouble \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv.c \
+-DUSE_INTEL \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/intelsingle \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv_transpose.c  \
+-DUSE_INTEL -DUSE_DOUBLE \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/inteldouble_transpose \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+gcc -O3 dgemv_transpose.c \
+-DUSE_INTEL \
+-DMKL_ILP64 -m64 -I/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/include \
+-o bin/intelsingle_transpose \
+-Wl,--start-group /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_intel_ilp64.a \
+/sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_gnu_thread.a /sw/csi/intel/2020/compilers_and_libraries/linux/mkl/lib/intel64/libmkl_core.a \
+-Wl,--end-group -lgomp -lpthread -lm -ldl
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 10000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 1.224e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 25000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 1.884e-06, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 20000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and single precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 1.696e-06, deallocating memory and write results to files. 
+
+/home/hongy0a/dgemv_benchmark/bash/intel_transpose.sh: line 15: 115081 Killed                  ./bin/intelsingle_transpose fixed 80000 8000 100 ${CPUTYPE}
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 10000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 2.279e-15, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 25000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 3.548e-15, deallocating memory and write results to files. 
+
+
+ This benchmark computes real vector y=alpha*A*x+beta*y, where A is matrix, y and x are vectors alpha and beta are scalars
+
+ 1) m : 20000 n: 5000 alpha: 1.000000 beta: 0.000000 nruns: 100
+
+ 2) use intel, mkl use 1 threads and double precision on cn605-08-r.
+
+ 3) Intializing matrix data with random number range from 0 to 1.
+
+ 4) Finish init, start to test, nruns is 100 warmup is 10 rounds. 
+
+ 5) mean precision 3.260e-15, deallocating memory and write results to files. 
+
+/home/hongy0a/dgemv_benchmark/bash/intel_transpose.sh: line 23: 115242 Killed                  ./bin/inteldouble_transpose fixed 80000 8000 100 ${CPUTYPE}
+slurmstepd: error: Detected 4 oom-kill event(s) in step 12952484.batch cgroup. Some of your processes may have been killed by the cgroup out-of-memory handler.
