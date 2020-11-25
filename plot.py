@@ -99,8 +99,48 @@ def basebandplot(df, mnlist, exptypes, pres='double'):
       tmpdf = df[dataidx]
       bardata[idx].append(tmpdf.bandwith.median())
   print(bardata)
-  # plt.figure(figsize=(4,3),dpi=150)
-  # fig, ax = plt.subplots()
+  plt.figure(figsize=(4,3),dpi=150)
+  fig, ax = plt.subplots()
+  ax.set_facecolor('lightgrey')
+  ax.set_alpha(0.0001)
+  x_11 =[i for i in range(len(exptypes))] 
+
+  x_21 =[i-.1 for i in range(len(exptypes))] 
+  x_22 =[i+.1 for i in range(len(exptypes))] 
+
+  x_31 =[i-.3 for i in range(len(exptypes))]
+  x_32 =[i-.1 for i in range(len(exptypes))]
+  x_33 =[i+.1 for i in range(len(exptypes))]
+
+  x_41 =[i-.3 for i in range(len(exptypes))]
+  x_42 =[i-.1 for i in range(len(exptypes))]
+  x_43 =[i+.1 for i in range(len(exptypes))]
+  x_44 =[i+.3 for i in range(len(exptypes))]
+  colors = ['red','green','blue','orange']
+  if len(exptypes) == 1:
+    ax.bar(x_11, bardata[0], color=colors[0],  width=0.2, label='{}_{}'.format(pres[0], exptypes[0]))
+  elif len(exptypes) == 2:
+    ax.bar(x_21, bardata[0], color=colors[0],  width=0.2, label='{}_{}'.format(pres[0], exptypes[0]))
+    ax.bar(x_22, bardata[0], color=colors[1],  width=0.2, label='{}_{}'.format(pres[0], exptypes[1]))
+  elif len(exptypes) == 3:
+    ax.bar(x_31, bardata[0], color=colors[0],  width=0.2, label='{}_{}'.format(pres[0], exptypes[0]))
+    ax.bar(x_32, bardata[1], color=colors[1],  width=0.2, label='{}_{}'.format(pres[0], exptypes[1]))
+    ax.bar(x_33, bardata[2], color=colors[2],  width=0.2, label='{}_{}'.format(pres[0], exptypes[2]))
+  elif len(exptypes) == 4:
+    ax.bar(x_41, bardata[0], color=colors[0],  width=0.2, label='{}_{}'.format(pres[0], exptypes[0]))
+    ax.bar(x_42, bardata[1], color=colors[1],  width=0.2, label='{}_{}'.format(pres[0], exptypes[1]))
+    ax.bar(x_43, bardata[2], color=colors[2],  width=0.2, label='{}_{}'.format(pres[0], exptypes[2]))
+    ax.bar(x_44, bardata[3], color=colors[3],  width=0.2, label='{}_{}'.format(pres[0], exptypes[3]))
+  else:
+    print('no suitable exptypes length')
+    exit()
+  plt.tight_layout()
+  plt.xlabel("Bandwidth (GB/s)",fontsize=12)
+  plt.ylabel("matrix size",fontsize=12)
+  
+  plt.legend()
+  plt.minorticks_on()
+  plt.show()
   # c=['r','g','b']
   # for idx,exp in enumerate(exptypes):
   #   if exp in set(df.exptype):
