@@ -89,10 +89,16 @@ def plotamd():
 
 
 def plotintel():
-  pass
+  df = pd.DataFrame()
+  for f in os.listdir('log'):
+    if f.endswith('skylake.txt') or f.endswith('cascadelake.txt'):
+      resmap = extractfile('log/'+f)
+      df = addmaptodf(df, resmap)
+  baseplot(df, ['skylake','cascadelake'])
 
 
-
+# %%
+plotintel()
 
 # %%
 
