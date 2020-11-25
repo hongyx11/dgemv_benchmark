@@ -92,29 +92,29 @@ double gettime(void)
 
 void naive_impl(real_t *A, real_t* x, real_t *y, int m, int n){
   #pragma omp parallel for
-  for(int i=0; i<m; i++){
+  for(int i=0; i<n; i++){
     y[i] = (real_t)0.0;
-    for(int j=0; j<n; j++){
-      y[i] += A[i + j * m] * x[j];
+    for(int j=0; j<m; j++){
+      y[i] += A[i*m + j] * x[j];
     }
   }
 }
 
 void Initdata_cpu(real_t *A, real_t* x, real_t *y, int m, int n){
-  memset(y, 0, sizeof(real_t) * m);
-  for(int i=0; i<n; i++){
+  memset(y, 0, sizeof(real_t) * n);
+  for(int i=0; i<m; i++){
     x[i] = (real_t)rand() / (real_t)RAND_MAX;
   }
-  for(int i=0; i<m; i++){
-    for(int j=0; j<n; j++){
-      long tmp = (long)i * (long)n + (long)j;
+  for(int i=0; i<n; i++){
+    for(int j=0; j<m; j++){
+      long tmp = (long)i + (long)j * n;
       A[tmp] = (real_t)rand() / (real_t)RAND_MAX;
     }
   }
 }
 
 
-double checkcorrectness(real_t *y, real_t *ynaive, int dim, int sumdim){
+double checkcorrectness(real_t *y, real_t *ynaive, int dim){
   double *rerr = (double*)malloc(sizeof(double)*dim);
   for(int i=0; i<dim; i++){
     rerr[i] =fabs(y[i] - ynaive[i]) / fabs(ynaive[i]);
@@ -180,10 +180,10 @@ int main(int argc, const char* argv[])
  */
 
 #ifdef USE_INTEL
-  A = (real_t *)mkl_malloc( m*n*sizeof( real_t ), 64 );
-  x = (real_t *)mkl_malloc( n*sizeof( real_t ), 64 );
-  y = (real_t *)mkl_malloc( m*sizeof( real_t ), 64 );
-  ynaive = (real_t *)mkl_malloc( m*sizeof( real_t ), 64 );
+  A = (real_t *)mkl_malloc( (long)m*(long)n*sizeof( real_t ), 64 );
+  x = (real_t *)mkl_malloc( (long)m*sizeof( real_t ), 64 );
+  y = (real_t *)mkl_malloc( (long)n*sizeof( real_t ), 64 );
+  ynaive = (real_t *)mkl_malloc( (long)n*sizeof( real_t ), 64 );
   if (A == NULL || x == NULL || y == NULL) {
     printf( "\n ERROR: Can't allocate memory for matrices. Aborting... \n\n");
     mkl_free(A);
@@ -205,20 +205,20 @@ int main(int argc, const char* argv[])
 #ifdef USE_NVIDIA 
   cudaSetDevice(0); 
   // malloc host 
-  A = (real_t *)malloc( m*n*sizeof( real_t ));
-  x = (real_t *)malloc( n*sizeof( real_t ));
-  y = (real_t *)malloc( m*sizeof( real_t ));
-  ynaive = (real_t *)malloc( m*sizeof( real_t ));
+  A = (real_t *)malloc( (long)m*(long)n*sizeof( real_t ));
+  x = (real_t *)malloc( (long)m*sizeof( real_t ));
+  y = (real_t *)malloc( (long)n*sizeof( real_t ));
+  ynaive = (real_t *)malloc( (long)n*sizeof( real_t ));
   cudaError_t cudaStat;
   cublasStatus_t stat;
   cublasHandle_t handle;
   real_t *d_A, *d_y, *d_x;
   // malloc device
-  cudaStat = cudaMalloc ((void**)&d_A, m*n*sizeof(real_t));
+  cudaStat = cudaMalloc ((void**)&d_A, (long)m*(long)n*sizeof(real_t));
   checkcudaerror(cudaStat);
-  cudaStat = cudaMalloc ((void**)&d_x, n*sizeof(real_t));
+  cudaStat = cudaMalloc ((void**)&d_x, (long)m*sizeof(real_t));
   checkcudaerror(cudaStat);
-  cudaStat = cudaMalloc ((void**)&d_y, m*sizeof(real_t));
+  cudaStat = cudaMalloc ((void**)&d_y, (long)n*sizeof(real_t));
   checkcudaerror(cudaStat);
   if (d_A == NULL || d_x == NULL || d_y == NULL) {
     printf( "\n ERROR: Can't allocate memory for matrices. Aborting... \n\n");
@@ -261,18 +261,18 @@ for(int nr=0; nr<nruns+warmup; nr++){
   double stime = 0.0, etime = 0.0, executiontime = 0.0;
   stime = gettime();
 #ifdef USE_DOUBLE
-  cblas_dgemv(CblasColMajor, CblasNoTrans, 
+  cblas_dgemv(CblasColMajor, CblasTrans, 
     m, n, alpha, A, m, x, 1, beta, y, 1);
 #else 
-  cblas_sgemv(CblasColMajor, CblasNoTrans, 
+  cblas_sgemv(CblasColMajor, CblasTrans, 
     m, n, alpha, A, m, x, 1, beta, y, 1);
 #endif 
   etime = gettime();
   if(nr < warmup) continue;
   executiontime = etime - stime;
   timestat[nr-warmup] = executiontime;
-  bandwithstat[nr-warmup] = sizeof(real_t)*(m*n+m+n)/(executiontime * 1e9);
-  presstat[nr-warmup] = checkcorrectness(y,ynaive, m,n);
+  bandwithstat[nr-warmup] = sizeof(real_t)*((long)m*(long)n+m+n)/(executiontime * 1e9);
+  presstat[nr-warmup] = checkcorrectness(y, ynaive, n);
 }
 #endif 
 
@@ -281,27 +281,27 @@ for(int nr=0; nr<nruns+warmup; nr++){
 #ifdef USE_NVIDIA
 for(int nr=0; nr<nruns+warmup; nr++){
   double stime = 0.0, etime = 0.0, executiontime = 0.0;
-  cudaMemcpy(d_A, A, m * n * sizeof(real_t), cudaMemcpyDefault);
-  cudaMemcpy(d_x, x, n * sizeof(real_t), cudaMemcpyDefault);
-  cudaMemcpy(d_y, y, m * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(d_A, A, (long)m * (long)n * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(d_x, x, m * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(d_y, y, n * sizeof(real_t), cudaMemcpyDefault);
   cudaDeviceSynchronize();
   stime = gettime();
 #ifdef USE_DOUBLE
-  cublasDgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
+  cublasDgemv(handle, CUBLAS_OP_T, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
 #else 
-  cublasSgemv(handle, CUBLAS_OP_N, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
+  cublasSgemv(handle, CUBLAS_OP_T, m, n, &alpha, d_A, m, d_x, 1, &beta, d_y, 1);
 #endif 
   cudaDeviceSynchronize();
   etime = gettime();
   executiontime = etime-stime;
-  cudaMemcpy(A, d_A, m * n * sizeof(real_t), cudaMemcpyDefault);
-  cudaMemcpy(x, d_x, n * sizeof(real_t), cudaMemcpyDefault);
-  cudaMemcpy(y, d_y, m * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(A, d_A, (long)m * (long)n * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(x, d_x, m * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(y, d_y, n * sizeof(real_t), cudaMemcpyDefault);
   cudaDeviceSynchronize();
   if(nr < warmup) continue;
   timestat[nr-warmup] = executiontime;
-  bandwithstat[nr-warmup] =  sizeof(real_t)*(m*n+m+n)/(executiontime * 1.0e9) ; 
-  presstat[nr-warmup] = checkcorrectness(y,ynaive, m,n);
+  bandwithstat[nr-warmup] =  sizeof(real_t)*((long)m*(long)n+m+n)/(executiontime * 1.0e9) ; 
+  presstat[nr-warmup] = checkcorrectness(y,ynaive, n);
 }
 #endif
 
@@ -315,10 +315,9 @@ for(int nr=0; nr<nruns+warmup; nr++){
   mkl_free(A);
   mkl_free(x);
   mkl_free(y);
-  
-  
+  double meanpres = mean(presstat,nruns);
   saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
-  printf (" 5) Deallocating memory and write results to files. \n\n");
+  printf (" 5) mean precision %.3e, deallocating memory and write results to files. \n\n", meanpres);
 #endif
 
 
@@ -329,8 +328,9 @@ for(int nr=0; nr<nruns+warmup; nr++){
   cudaFree(d_A);
   cudaFree(d_x);
   cudaFree(d_y);
+  double meanpres = mean(presstat,nruns);
   saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
-  printf (" 5) Deallocating memory and write results to files. \n\n");
+  printf (" 5) mean precision %.3e, deallocating memory and write results to files. \n\n", meanpres);
 #endif 
 
   free(timestat);

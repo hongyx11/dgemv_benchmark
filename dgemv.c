@@ -95,7 +95,7 @@ void naive_impl(real_t *A, real_t* x, real_t *y, int m, int n){
   for(int i=0; i<m; i++){
     y[i] = (real_t)0.0;
     for(int j=0; j<n; j++){
-      y[i] += A[i + j * m] * x[j];
+      y[i] += A[(long)i + (long)j * (long)m] * x[j];
     }
   }
 }
@@ -181,9 +181,9 @@ int main(int argc, const char* argv[])
 
 #ifdef USE_INTEL
   A = (real_t *)mkl_malloc( (long)m*(long)n*sizeof( real_t ), 64 );
-  x = (real_t *)mkl_malloc( n*sizeof( real_t ), 64 );
-  y = (real_t *)mkl_malloc( m*sizeof( real_t ), 64 );
-  ynaive = (real_t *)mkl_malloc( m*sizeof( real_t ), 64 );
+  x = (real_t *)mkl_malloc( (long)n*sizeof( real_t ), 64 );
+  y = (real_t *)mkl_malloc( (long)m*sizeof( real_t ), 64 );
+  ynaive = (real_t *)mkl_malloc( (long)m*sizeof( real_t ), 64 );
   if (A == NULL || x == NULL || y == NULL) {
     printf( "\n ERROR: Can't allocate memory for matrices. Aborting... \n\n");
     mkl_free(A);
@@ -206,9 +206,9 @@ int main(int argc, const char* argv[])
   cudaSetDevice(0); 
   // malloc host 
   A = (real_t *)malloc( (long)m*(long)n*sizeof( real_t ));
-  x = (real_t *)malloc( n*sizeof( real_t ));
-  y = (real_t *)malloc( m*sizeof( real_t ));
-  ynaive = (real_t *)malloc( m*sizeof( real_t ));
+  x = (real_t *)malloc( (long)n*sizeof( real_t ));
+  y = (real_t *)malloc( (long)m*sizeof( real_t ));
+  ynaive = (real_t *)malloc( (long)m*sizeof( real_t ));
   cudaError_t cudaStat;
   cublasStatus_t stat;
   cublasHandle_t handle;
@@ -216,9 +216,9 @@ int main(int argc, const char* argv[])
   // malloc device
   cudaStat = cudaMalloc ((void**)&d_A, (long)m*(long)n*sizeof(real_t));
   checkcudaerror(cudaStat);
-  cudaStat = cudaMalloc ((void**)&d_x, n*sizeof(real_t));
+  cudaStat = cudaMalloc ((void**)&d_x, (long)n*sizeof(real_t));
   checkcudaerror(cudaStat);
-  cudaStat = cudaMalloc ((void**)&d_y, m*sizeof(real_t));
+  cudaStat = cudaMalloc ((void**)&d_y, (long)m*sizeof(real_t));
   checkcudaerror(cudaStat);
   if (d_A == NULL || d_x == NULL || d_y == NULL) {
     printf( "\n ERROR: Can't allocate memory for matrices. Aborting... \n\n");
@@ -271,7 +271,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   if(nr < warmup) continue;
   executiontime = etime - stime;
   timestat[nr-warmup] = executiontime;
-  bandwithstat[nr-warmup] = sizeof(real_t)*(m*n+m+n)/(executiontime * 1e9);
+  bandwithstat[nr-warmup] = sizeof(real_t)*((long)m*(long)n+m+n)/(executiontime * 1e9);
   presstat[nr-warmup] = checkcorrectness(y,ynaive, m,n);
 }
 #endif 
@@ -300,7 +300,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   cudaDeviceSynchronize();
   if(nr < warmup) continue;
   timestat[nr-warmup] = executiontime;
-  bandwithstat[nr-warmup] =  sizeof(real_t)*(m*n+m+n)/(executiontime * 1.0e9) ; 
+  bandwithstat[nr-warmup] =  sizeof(real_t)*((long)m*(long)n+m+n)/(executiontime * 1.0e9) ; 
   presstat[nr-warmup] = checkcorrectness(y,ynaive, m,n);
 }
 #endif
@@ -317,7 +317,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   mkl_free(y);
   double meanpres = mean(presstat,nruns);
   saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
-  printf (" 5) mean pres %.3e, deallocating memory and write results to files. \n\n", meanpres);
+  printf (" 5) mean precision: %.3e, deallocating memory and write results to files. \n\n", meanpres);
 #endif
 
 
@@ -330,7 +330,7 @@ for(int nr=0; nr<nruns+warmup; nr++){
   cudaFree(d_y);
   double meanpres = mean(presstat,nruns);
   saveresults(m,n,timestat, presstat, bandwithstat, nruns, exptype);
-  printf (" 5) mean pres %.3e, deallocating memory and write results to files. \n\n", meanpres);
+  printf (" 5) mean precision: %.3e, deallocating memory and write results to files. \n\n", meanpres);
 #endif 
 
   free(timestat);

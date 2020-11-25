@@ -21,6 +21,22 @@ intel:
 	${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a \
 	-Wl,--end-group -lgomp -lpthread -lm -ldl
 
+	${CC} -O3 dgemv_transpose.c  \
+	-DUSE_INTEL -DUSE_DOUBLE \
+	-DMKL_ILP64 -m64 -I${MKLROOT}/include \
+	-o bin/inteldouble_transpose \
+	-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a \
+	${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a \
+	-Wl,--end-group -lgomp -lpthread -lm -ldl
+
+	${CC} -O3 dgemv_transpose.c \
+	-DUSE_INTEL \
+	-DMKL_ILP64 -m64 -I${MKLROOT}/include \
+	-o bin/intelsingle_transpose \
+	-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a \
+	${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a \
+	-Wl,--end-group -lgomp -lpthread -lm -ldl
+
 nvidia:
 	mkdir -p bin
 	mkdir -p log

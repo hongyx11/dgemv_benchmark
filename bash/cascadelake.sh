@@ -15,3 +15,4 @@ module load gcc/8.2.0
 module load intel/2020
 echo "Working Dir is $(pwd)" 
 source /home/hongy0a/dgemv_benchmark/bash/intel.sh cascadelake
+source /home/hongy0a/dgemv_benchmark/bash/intel_transpose.sh cascadelake
