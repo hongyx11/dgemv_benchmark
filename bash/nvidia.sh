@@ -17,15 +17,15 @@ exit
 fi
 
 # no transpose 
-./bin/nvidiasingle fixed 5000 10000 100 ${GPUTYPE} 
-./bin/nvidiasingle fixed 5000 20000 100 ${GPUTYPE} 
-./bin/nvidiasingle fixed 5000 25000 100 ${GPUTYPE} 
-./bin/nvidiasingle fixed 8000 80000 100 ${GPUTYPE} 
-# ./bin/nvidiasingle fixed 35000 70000 100 ${GPUTYPE} 
+./bin/nvidiasingle fixed 5000 10000 1000 ${GPUTYPE} 
+./bin/nvidiasingle fixed 5000 20000 1000 ${GPUTYPE} 
+./bin/nvidiasingle fixed 5000 25000 1000 ${GPUTYPE} 
+./bin/nvidiasingle fixed 8000 80000 1000 ${GPUTYPE} 
+# ./bin/nvidiasingle fixed 35000 70000 1000 ${GPUTYPE} 
 
 # no transpose 
-./bin/nvidiadouble fixed 5000 10000 100 ${GPUTYPE} 
-./bin/nvidiadouble fixed 5000 20000 100 ${GPUTYPE} 
-./bin/nvidiadouble fixed 5000 25000 100 ${GPUTYPE} 
-./bin/nvidiadouble fixed 8000 80000 100 ${GPUTYPE} 
-# ./bin/nvidiadouble fixed 35000 70000 100 ${GPUTYPE} 
+./bin/nvidiadouble fixed 5000 10000 1000 ${GPUTYPE} 
+./bin/nvidiadouble fixed 5000 20000 1000 ${GPUTYPE} 
+./bin/nvidiadouble fixed 5000 25000 1000 ${GPUTYPE} 
+./bin/nvidiadouble fixed 8000 80000 1000 ${GPUTYPE} 
+# ./bin/nvidiadouble fixed 35000 70000 1000 ${GPUTYPE} 
