@@ -1,4 +1,7 @@
 
+CC=gcc
+NVCC=nvcc
+
 intel:
 	CC=gcc
 	mkdir -p bin
@@ -64,8 +67,6 @@ nec:
 
 
 nvidia:
-	CC=gcc
-	NVCC=nvcc
 	mkdir -p bin
 	mkdir -p log
 	mkdir -p plots
