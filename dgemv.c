@@ -314,9 +314,9 @@ for(int nr=0; nr<nruns+warmup; nr++){
 #ifdef USE_NVIDIA
 for(int nr=0; nr<nruns+warmup; nr++){
   double stime = 0.0, etime = 0.0, executiontime = 0.0;
-  cudaMemcpy(d_A, A, m * n * sizeof(real_t), cudaMemcpyDefault);
-  cudaMemcpy(d_x, x, n * sizeof(real_t), cudaMemcpyDefault);
-  cudaMemcpy(d_y, y, m * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(d_A, A, (long)m*(long)n * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(d_x, x, (long)n * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(d_y, y, (long)m * sizeof(real_t), cudaMemcpyDefault);
   cudaDeviceSynchronize();
   stime = gettime();
 #ifdef USE_DOUBLE
@@ -327,9 +327,9 @@ for(int nr=0; nr<nruns+warmup; nr++){
   cudaDeviceSynchronize();
   etime = gettime();
   executiontime = etime-stime;
-  cudaMemcpy(A, d_A, m * n * sizeof(real_t), cudaMemcpyDefault);
-  cudaMemcpy(x, d_x, n * sizeof(real_t), cudaMemcpyDefault);
-  cudaMemcpy(y, d_y, m * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(A, d_A, (long)m*(long)n  * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(x, d_x, (long)n * sizeof(real_t), cudaMemcpyDefault);
+  cudaMemcpy(y, d_y, (long)m * sizeof(real_t), cudaMemcpyDefault);
   cudaDeviceSynchronize();
   if(nr < warmup) continue;
   timestat[nr-warmup] = executiontime;
