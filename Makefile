@@ -1,9 +1,8 @@
 
-CC=gcc
+CC=gcc -std=gnu99
 NVCC=nvcc
 
 intel:
-	CC=gcc
 	mkdir -p bin
 	mkdir -p log
 	mkdir -p plots
@@ -91,7 +90,6 @@ nvidia:
 	-I${CUDAROOT}/include -L${CUDAROOT}/lib64 -lcublas -lcudart 
 
 amd:
-	CC=gcc
 	mkdir -p bin
 	mkdir -p log
 	mkdir -p plots
