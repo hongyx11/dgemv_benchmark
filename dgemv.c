@@ -221,9 +221,17 @@ int main(int argc, const char* argv[])
   memset(machinename, 0, 150);
   gethostname(machinename,150);
   #ifdef USE_DOUBLE
-  printf(" 2) use nec, nlc use %d threads and double precision on %s.\n\n", threads, machinename);
+      #ifdef USE_NEC
+          printf(" 2) use nec, nlc use %d threads and double precision on %s.\n\n", threads, machinename);
+      #else
+          printf(" 2) use amd, openblas use %d threads and double precision on %s.\n\n", threads, machinename);
+      #endif
   #else
-  printf(" 2) use nec, nlc use %d threads and single precision on %s.\n\n", threads, machinename);
+      #ifdef USE_NEC
+          printf(" 2) use nec, nlc use %d threads and single precision on %s.\n\n", threads, machinename);
+      #else
+          printf(" 2) use amd, openblas use %d threads and single precision on %s.\n\n", threads, machinename);
+      #endif
   #endif
 #endif 
 
