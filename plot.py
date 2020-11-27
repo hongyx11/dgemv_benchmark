@@ -179,8 +179,9 @@ def timeplot(df, mnlist, exptypes, precision='double'):
   plt.grid(which='both', color='white', linewidth='0.3')
   plt.savefig('Time_{}.pdf'.format(precision),bbox_inches='tight')
 
-
-mnlist = [[2000,14000],[5000,10000],[5000,25000],[5000,20000],[8000,80000],[35000,70000]]  
+# these are the dimension we are lookging into
+# it matches the order of instrs, ['SCEXAO','MICADO [1]','MICADO [2]','MAVIS','MAORY','EPICS']
+mnlist = [[2000,10000],[5000,10000],[5000,25000],[5000,20000],[8000,80000],[35000,70000]]  
 searchfolder = 'log'
 precision = 'double'
 exptypes = ['amd','cascadelake','nec','a100']
