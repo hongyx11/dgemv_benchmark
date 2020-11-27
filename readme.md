@@ -5,8 +5,17 @@
 
 ## usage
 
-put results in log, in terminal launch plot.py
+1. bandwidth plot
 
-`python plot.py`
+`python bandwidthplot.py`
 
-results are Time_double.pdf and Bandwidth_double.pdf
+2. speedup plot 
+
+`python speedupplot.py`
+
+3. histogram and trace plot
+
+`python histtraceplot.py`
+
+
+results are stored inside plots.
