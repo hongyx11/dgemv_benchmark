@@ -39,7 +39,14 @@ def getboxplottimeinput(df, exptypes):
     ret.append(df[df.exptype == exp].time.to_numpy().tolist())
   return ret
 
-def bandwidthplot(df, mnlist, exptypes, precision='double'):
+def selectdata(df, m, n, explist, pres='double'):
+  idx = df.exptype == explist[0]
+  for exp in explist:
+    idx = idx | (df.exptype == exp)
+  idx = (df.M == m) & (df.N == n) & idx &(df.pres == pres)
+  return df[idx]
+
+def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
   bardata = [[] for _ in range(len(exptypes))]
   for idx,exp in enumerate(exptypes):
     for mnidx in range(len(mnlist)):
@@ -107,7 +114,7 @@ def bandwidthplot(df, mnlist, exptypes, precision='double'):
   plt.grid(which='both', color='white', linewidth='0.3')
   plt.savefig('Bandwidth_{}.pdf'.format(precision),bbox_inches='tight')
 
-def timeplot(df, mnlist, exptypes, precision='double'):
+def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
 #   plt.figure(figsize=(4,3),dpi=150)
   fig,ax = plt.subplots()
   ax.set_facecolor('lightgrey')
@@ -171,3 +178,15 @@ def timeplot(df, mnlist, exptypes, precision='double'):
   plt.minorticks_on()
   plt.grid(which='both', color='white', linewidth='0.3')
   plt.savefig('Time_{}.pdf'.format(precision),bbox_inches='tight')
+
+  
+def loaddatafromtxt(mnlist, exptypes, searchfolder):
+  df = pd.DataFrame()
+  for k,v in mnlist:
+    for exp in exptypes:
+      for f in os.listdir(searchfolder):
+        if f.endswith(exp+'.txt') and f.startswith("M{}N{}".format(k,v)):
+          fpath = searchfolder + '/' + f
+          resmapdf = extractfile(fpath)
+          df = df.append(resmapdf,ignore_index=True)
+  return df

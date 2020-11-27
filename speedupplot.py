@@ -4,20 +4,21 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import sys
-
+sys.path.append('.')
+from module import *
 """
 global variable
 """
 instrs = ['SCEXAO','MICADO [1]','MICADO [2]','MAVIS','MAORY','EPICS']
+instrs_plt = ['SCEXAO','MICADO1','MICADO2','MAVIS','MAORY','EPICS']
 labeltype = ['AMD Epyc Rome','Intel Cascade Lake','NEC SX-Aurora','NVIDIA A100']
 
-transpose = 'Notrans'
-if transpose == 'Notrans':
-  mnlist = [[2000,14000],[5000,10000],[5000,25000],[5000,20000] \
-  ,[8000,80000],[35000,70000]]
-else:
-  mnlist = [[14000,2000],[10000,5000],[25000,5000],[20000,5000]\
-  ,[80000,8000],[70000,35000]]
+if not os.path.exists('plots'):
+    os.makedirs('plots')
+
+if not os.path.exists('plots/speedup'):
+    os.makedirs('plots/speedup')
+
 mnlist = [
   [250,14000],
   [500,14000],
@@ -45,9 +46,10 @@ mnlist = [
   [35000,70000]
 ]
 
-searchfolder = '/Users/hongy0a/tmplog/dgemv_benchmark/log'
+transpose='Notrans'
+searchfolder = 'log'
 precision = 'double'
-exptypes = ['amd','cascadelake','nec','a100']
+exptypes = ['a100']
 
 print("genrating plots for ", transpose, " mnlist ", mnlist)
 print("searching folder: ", searchfolder)
@@ -63,7 +65,30 @@ for k,v in mnlist:
         fpath = searchfolder + '/' + f
         resmapdf = extractfile(fpath)
         df = df.append(resmapdf,ignore_index=True)
-for exp in exptypes:
-  if exp not in set(df.exptype):
-    print("we have not results for ", exp, ", please check and relaunch.")
-    exit()
+
+medianlist = []
+for k,v in mnlist:
+  tmpdf = selectdata(df,k,v,['a100'])
+  medianlist.append(np.median(tmpdf.time.to_numpy()))
+
+for instridx in range(6):
+  fig, ax1 = plt.subplots()
+  color = 'tab:green'
+  ax1.set_xlabel('# of GPUs')
+  ret = medianlist[instridx*4:(instridx+1)*4]
+  ret.reverse()
+  ret = np.array(ret)
+  ret = ret[0] / ret
+  ax1.set_ylabel('Speed up', color='green', fontsize=14)
+  ax1.tick_params(axis='y', labelcolor='green')
+  plt.plot([1,2,4,8],linestyle='dashed',label='ideal speed up',marker='.')
+  plt.plot(ret,marker='x')
+  ax1.set_facecolor('lightgrey')
+  ax1.set_alpha(0.0001)
+  xtick = ['1','2','4','8']
+  plt.grid(which='both', color='white', linewidth='0.3')
+  plt.xlabel("# of GPUs", fontsize=14)
+  plt.title('NVIDIA A100 speed up on {} '.format(instrs[instridx]))
+  plt.xticks(range(len(xtick)), xtick,fontsize=12)
+  plt.savefig('plots/speedup/speedup_a100_{}.pdf'.format(instrs_plt[instridx]))
+plt.show()
