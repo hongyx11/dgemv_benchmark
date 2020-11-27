@@ -51,12 +51,12 @@ fi
 ./bin/nvidiasingle fixed 2000 10000 1000 ${GPUTYPE} # Dimension for 1 GPU
 ./bin/nvidiasingle fixed 1000 10000 1000 ${GPUTYPE} # Dimension for 2 GPUs
 ./bin/nvidiasingle fixed 500 10000 1000 ${GPUTYPE} # Dimension for 4 GPUs
-./bin/nvidiasingle fixed 200 10000 1000 ${GPUTYPE} # Dimension for 8 GPUs
+./bin/nvidiasingle fixed 250 10000 1000 ${GPUTYPE} # Dimension for 8 GPUs
 
 ./bin/nvidiadouble fixed 2000 10000 1000 ${GPUTYPE} # Dimension for 1 GPU
 ./bin/nvidiadouble fixed 1000 10000 1000 ${GPUTYPE} # Dimension for 2 GPUs
 ./bin/nvidiadouble fixed 500 10000 1000 ${GPUTYPE} # Dimension for 4 GPUs
-./bin/nvidiadouble fixed 200 10000 1000 ${GPUTYPE} # Dimension for 8 GPUs
+./bin/nvidiadouble fixed 250 10000 1000 ${GPUTYPE} # Dimension for 8 GPUs
 
 ###########################################################################
 
@@ -65,12 +65,12 @@ fi
 ./bin/nvidiasingle fixed 2000 14000 1000 ${GPUTYPE} # Dimension for 1 GPU
 ./bin/nvidiasingle fixed 1000 14000 1000 ${GPUTYPE} # Dimension for 2 GPUs
 ./bin/nvidiasingle fixed 500 14000 1000 ${GPUTYPE} # Dimension for 4 GPUs
-./bin/nvidiasingle fixed 200 14000 1000 ${GPUTYPE} # Dimension for 8 GPUs
+./bin/nvidiasingle fixed 250 14000 1000 ${GPUTYPE} # Dimension for 8 GPUs
 
 ./bin/nvidiadouble fixed 2000 14000 1000 ${GPUTYPE} # Dimension for 1 GPU
 ./bin/nvidiadouble fixed 1000 14000 1000 ${GPUTYPE} # Dimension for 2 GPUs
 ./bin/nvidiadouble fixed 500 14000 1000 ${GPUTYPE} # Dimension for 4 GPUs
-./bin/nvidiadouble fixed 200 14000 1000 ${GPUTYPE} # Dimension for 8 GPUs
+./bin/nvidiadouble fixed 250 14000 1000 ${GPUTYPE} # Dimension for 8 GPUs
 
 ###########################################################################
 
