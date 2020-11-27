@@ -1,42 +1,41 @@
 
-CC=gcc
+CC=gcc -std=gnu99
 NVCC=nvcc
 
 intel:
-	CC=gcc
 	mkdir -p bin
 	mkdir -p log
 	mkdir -p plots
 	${CC} -O3 dgemv.c  \
 	-DUSE_INTEL -DUSE_DOUBLE \
-	-DMKL_ILP64 -m64 -I${MKLROOT}/include \
+	-DMKL_ILP64 -m64 -I${MKL_ROOT}/include \
 	-o bin/inteldouble \
-	-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a \
-	${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a \
+	-Wl,--start-group ${MKL_ROOT}/lib/intel64/libmkl_intel_ilp64.a \
+	${MKL_ROOT}/lib/intel64/libmkl_gnu_thread.a ${MKL_ROOT}/lib/intel64/libmkl_core.a \
 	-Wl,--end-group -lgomp -lpthread -lm -ldl
 
 	${CC} -O3 dgemv.c \
 	-DUSE_INTEL \
-	-DMKL_ILP64 -m64 -I${MKLROOT}/include \
+	-DMKL_ILP64 -m64 -I${MKL_ROOT}/include \
 	-o bin/intelsingle \
-	-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a \
-	${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a \
+	-Wl,--start-group ${MKL_ROOT}/lib/intel64/libmkl_intel_ilp64.a \
+	${MKL_ROOT}/lib/intel64/libmkl_gnu_thread.a ${MKL_ROOT}/lib/intel64/libmkl_core.a \
 	-Wl,--end-group -lgomp -lpthread -lm -ldl
 
 	${CC} -O3 dgemv_transpose.c  \
 	-DUSE_INTEL -DUSE_DOUBLE \
-	-DMKL_ILP64 -m64 -I${MKLROOT}/include \
+	-DMKL_ILP64 -m64 -I${MKL_ROOT}/include \
 	-o bin/inteldouble_transpose \
-	-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a \
-	${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a \
+	-Wl,--start-group ${MKL_ROOT}/lib/intel64/libmkl_intel_ilp64.a \
+	${MKL_ROOT}/lib/intel64/libmkl_gnu_thread.a ${MKL_ROOT}/lib/intel64/libmkl_core.a \
 	-Wl,--end-group -lgomp -lpthread -lm -ldl
 
 	${CC} -O3 dgemv_transpose.c \
 	-DUSE_INTEL \
-	-DMKL_ILP64 -m64 -I${MKLROOT}/include \
+	-DMKL_ILP64 -m64 -I${MKL_ROOT}/include \
 	-o bin/intelsingle_transpose \
-	-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a \
-	${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a \
+	-Wl,--start-group ${MKL_ROOT}/lib/intel64/libmkl_intel_ilp64.a \
+	${MKL_ROOT}/lib/intel64/libmkl_gnu_thread.a ${MKL_ROOT}/lib/intel64/libmkl_core.a \
 	-Wl,--end-group -lgomp -lpthread -lm -ldl
 
 
@@ -91,7 +90,6 @@ nvidia:
 	-I${CUDAROOT}/include -L${CUDAROOT}/lib64 -lcublas -lcudart 
 
 amd:
-	CC=gcc
 	mkdir -p bin
 	mkdir -p log
 	mkdir -p plots
