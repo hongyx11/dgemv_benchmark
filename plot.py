@@ -9,7 +9,7 @@ import sys
 global variable
 """
 instrs = ['SCEXAO','MICADO [1]','MICADO [2]','MAVIS','MAORY','EPICS']
-labeltype = ['AMD Epyc Rome','Intel Cascade Lake','NEC SX-Aurora','NVIDIA A100']
+labeltype = ['AMD Epyc Rome','Intel Cascade Lake','NEC SX-Aurora 20B','NVIDIA A100']
 
 #%%
 def extractfile(filename):
@@ -106,7 +106,7 @@ def bandwidthplot(df, mnlist, exptypes, precision='double'):
     print('no suitable exptypes length')
     exit()
 #   plt.tight_layout()
-  plt.xlabel("Intruments",fontsize=12)
+  plt.xlabel("Instruments",fontsize=12)
   plt.ylabel("Bandwidth (GB/s)",fontsize=12)
 
   plt.legend(loc='upper left')
@@ -184,7 +184,7 @@ def timeplot(df, mnlist, exptypes, precision='double'):
 mnlist = [[2000,10000],[5000,10000],[5000,25000],[5000,20000],[8000,80000],[35000,70000]]  
 searchfolder = 'log'
 precision = 'double'
-exptypes = ['amd','cascadelake','nec','a100']
+exptypes = ['amd','cascadelake','NEC_20B','a100']
 
 print("genrating dimension size: ", mnlist)
 print("searching folder: ", searchfolder)
