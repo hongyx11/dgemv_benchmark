@@ -112,7 +112,7 @@ def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
   plt.legend(loc='upper left')
   plt.minorticks_on()
   plt.grid(which='both', color='white', linewidth='0.3')
-  plt.savefig('Bandwidth_{}.pdf'.format(precision),bbox_inches='tight')
+  plt.savefig('plots/bandwidth/Bandwidth_{}.pdf'.format(precision),bbox_inches='tight')
 
 def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
 #   plt.figure(figsize=(4,3),dpi=150)
@@ -177,7 +177,7 @@ def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
   plt.legend()
   plt.minorticks_on()
   plt.grid(which='both', color='white', linewidth='0.3')
-  plt.savefig('Time_{}.pdf'.format(precision),bbox_inches='tight')
+  plt.savefig('plots/bandwidth/Time_{}.pdf'.format(precision),bbox_inches='tight')
 
   
 def loaddatafromtxt(mnlist, exptypes, searchfolder):

@@ -67,7 +67,7 @@ for k,v in mnlist:
 
 medianlist = []
 for k,v in mnlist:
-  tmpdf = selectdata(df,k,v,['a100'])
+  tmpdf = selectdata(df,k,v,exptypes)
   medianlist.append(np.median(tmpdf.time.to_numpy()))
 
 for instridx in range(6):
