@@ -1,21 +1,26 @@
-
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
-import seaborn as sns
 import sys
+
+"""
+global variable
+"""
+instrs = ['SCEXAO','MICADO [1]','MICADO [2]','MAVIS','MAORY','EPICS']
+labeltype = ['AMD','Cascade Lake','NEC SX-Aurora','NVIDIA A100']
+
 #%%
 def extractfile(filename):
   resmap = {}
   with open(filename, 'r') as f:
     f.readline()
-    resmap['M'] = int(f.readline().strip('\n'))
+    m = int(f.readline().strip('\n'))
     f.readline()
-    resmap['N'] = int(f.readline().strip('\n'))
+    n = int(f.readline().strip('\n'))
     f.readline()
-    resmap['pres'] = f.readline().strip('\n')
+    pres = f.readline().strip('\n')
     f.readline()
     fplist = f.readline().strip('\n').split(' ')
     resmap['time'] = [float(x) for x in fplist]
@@ -24,190 +29,166 @@ def extractfile(filename):
     resmap['relerr'] = [float(x) for x in relist]
     f.readline()
     bdlist = f.readline().strip('\n').split(' ')
-    resmap['bd'] = [float(x) for x in bdlist]
+    resmap['bandwidth'] = [float(x) for x in bdlist]
     f.readline()
-    resmap['exptype'] = f.readline().strip('\n')
-    return resmap
-
-
-def addmaptodf(df, resmap):
-  if df.empty:
-    df = pd.DataFrame({'M':[],'N':[],'pres':[],'flops_gbs':[],
-    'relerr':[],'bandwith':[],'exptype':[]})
-  for i in range(len(resmap['time'])):
-    m = resmap['M']
-    n = resmap['N']
-    pres = resmap['pres']
-    time = resmap['time'][i]
-    exptype = resmap['exptype']
-    bd = resmap['bd'][i]
-    newrow = {'M':m,'N':n,'pres':pres,'time': time,
-    'relerr':resmap['relerr'][i],'bandwith':bd,'exptype':exptype}
-    df = df.append(newrow,ignore_index=True)
+    exptype = f.readline().strip('\n')
+    nruns = len(resmap['bandwidth'])
+    resmap['M'] = [m for _ in range(nruns)]    
+    resmap['N'] = [n for _ in range(nruns)]
+    resmap['pres'] = [pres for _ in range(nruns)]
+    resmap['exptype'] = [exptype for _ in range(nruns)]
+  df = pd.DataFrame.from_dict(resmap)
   return df
 
+def getboxplottimeinput(df, exptypes):
+  ret = []
+  for exp in exptypes:
+    ret.append(df[df.exptype == exp].time.to_numpy().tolist())
+  return ret
 
-def timeplot(df, exptype,c='r'):
-  spidx = (df.pres == 'single') & (df.exptype == exptype)
-  dpidx = (df.pres == 'double') & (df.exptype == exptype)
-  ax = sns.boxplot(x='N', y='abstime', data=df[spidx],fliersize=1,width=0.2,color='skyblue')
-  singlefpmean = df[spidx].groupby('N').median().abstime.to_numpy()
-  plt.plot(singlefpmean,label='SP,'+exptype,color=c,linestyle='-',marker='.')
-  ax = sns.boxplot(x='N', y='abstime', data=df[dpidx],fliersize=1,width=0.2,color='magenta')
-  doublefpmean = df[dpidx].groupby('N').median().abstime.to_numpy()
-  plt.plot(doublefpmean,label='DP,'+exptype,color=c, linestyle='--',marker='.')
-  return ax
-
-def basetmplot(df, exptypes):
-  plt.figure(figsize=(4,3),dpi=150)
-  c=['r','g','b']
-  for idx,exp in enumerate(exptypes):
-    if exp in set(df.exptype):
-      print('ploting ',exp)
-      ax = timeplot(df,exp,c[idx])
-  ax.xaxis.set_tick_params(labelsize=8)
-  ax.yaxis.set_tick_params(labelsize=8)
-  ax.set_xticklabels(labels=[str(int(x)) for x in sorted(set(df.N))])
-  plt.grid(True, 'both')
-  plt.xlabel("M = N",fontsize=10)
-  plt.ylabel("Time(s)",fontsize=10)
-  plt.legend(fontsize=7)
-  plt.yscale('log')
-  plt.savefig("plots/{}_time.pdf".format("-".join(exptypes)),bbox_inches='tight')
-  plt.show()
-
-
-def bandplot(df, exptype,c='r'):
-  spidx = (df.pres == 'single') & (df.exptype == exptype)
-  dpidx = (df.pres == 'double') & (df.exptype == exptype)
-  ax = sns.boxplot(x='N', y='bandwith', data=df[spidx],fliersize=1,width=0.2,color='skyblue')
-  singlefpmean = df[spidx].groupby('N').median().bandwith.to_numpy()
-  plt.plot(singlefpmean,label='SP,'+exptype,color=c,linestyle='-',marker='.')
-  ax = sns.boxplot(x='N', y='bandwith', data=df[dpidx],fliersize=1,width=0.2,color='magenta')
-  doublefpmean = df[dpidx].groupby('N').median().bandwith.to_numpy()
-  plt.plot(doublefpmean,label='DP,'+exptype,color=c, linestyle='--',marker='.')
-  return ax
-
-def basebandplot(df, mnlist, exptypes, pres='double'):
-  # bandplot is a bar plot!
-  # first get mean bandwith
+def bandwidthplot(df, mnlist, exptypes, precision='double'):
   bardata = [[] for _ in range(len(exptypes))]
   for idx,exp in enumerate(exptypes):
     for mnidx in range(len(mnlist)):
-      dataidx = (df.pres == pres) & (df.exptype == exp) & \
+      dataidx = (df.pres == precision) & (df.exptype == exp) & \
         (df.M == mnlist[mnidx][0]) & (df.N == mnlist[mnidx][1])
       tmpdf = df[dataidx]
-      bardata[idx].append(tmpdf.bandwith.median())
-  print(bardata)
-  plt.figure(figsize=(4,3),dpi=150)
+      bardata[idx].append(tmpdf.bandwidth.median())
+#   plt.figure(figsize=(4,3),dpi=150)
   fig, ax = plt.subplots()
   ax.set_facecolor('lightgrey')
   ax.set_alpha(0.0001)
-  x_11 =[i for i in range(len(exptypes))] 
+  x_11 =[i for i in range(len(mnlist))] 
 
-  x_21 =[i-.1 for i in range(len(exptypes))] 
-  x_22 =[i+.1 for i in range(len(exptypes))] 
+  x_21 =[i-.1 for i in range(len(mnlist))] 
+  x_22 =[i+.1 for i in range(len(mnlist))] 
 
-  x_31 =[i-.3 for i in range(len(exptypes))]
-  x_32 =[i-.1 for i in range(len(exptypes))]
-  x_33 =[i+.1 for i in range(len(exptypes))]
+  x_31 =[i-.2 for i in range(len(mnlist))]
+  x_32 =[i for i in range(len(mnlist))]
+  x_33 =[i+.2 for i in range(len(mnlist))]
 
-  x_41 =[i-.3 for i in range(len(exptypes))]
-  x_42 =[i-.1 for i in range(len(exptypes))]
-  x_43 =[i+.1 for i in range(len(exptypes))]
-  x_44 =[i+.3 for i in range(len(exptypes))]
-  colors = ['red','green','blue','orange']
+  x_41 =[i-.3 for i in range(len(mnlist))]
+  x_42 =[i-.1 for i in range(len(mnlist))]
+  x_43 =[i+.1 for i in range(len(mnlist))]
+  x_44 =[i+.3 for i in range(len(mnlist))]
+  colors = ['orange','blue','darkgreen','magenta']
   if len(exptypes) == 1:
-    ax.bar(x_11, bardata[0], color=colors[0],  width=0.2, label='{}_{}'.format(pres[0], exptypes[0]))
+    ax.bar(x_11, bardata[0], color=colors[0],  
+           width=0.2, label='{}'.format(exptypes[0]))
   elif len(exptypes) == 2:
-    ax.bar(x_21, bardata[0], color=colors[0],  width=0.2, label='{}_{}'.format(pres[0], exptypes[0]))
-    ax.bar(x_22, bardata[0], color=colors[1],  width=0.2, label='{}_{}'.format(pres[0], exptypes[1]))
+    ax.bar(x_21, bardata[0], color=colors[0],  
+           width=0.2, label='{}'.format(labeltype[0]))
+    ax.bar(x_22, bardata[1], color=colors[1],  
+           width=0.2, label='{}'.format(labeltype[1]))
+    plt.xticks([i for i in range(len(mnlist))],instrs,fontsize=10)
+
   elif len(exptypes) == 3:
-    ax.bar(x_31, bardata[0], color=colors[0],  width=0.2, label='{}_{}'.format(pres[0], exptypes[0]))
-    ax.bar(x_32, bardata[1], color=colors[1],  width=0.2, label='{}_{}'.format(pres[0], exptypes[1]))
-    ax.bar(x_33, bardata[2], color=colors[2],  width=0.2, label='{}_{}'.format(pres[0], exptypes[2]))
+    ax.bar(x_31, bardata[0], color=colors[0],  
+           width=0.2, label='{}'.format(exptypes[0]))
+    ax.bar(x_32, bardata[1], color=colors[1],  
+           width=0.2, label='{}'.format(exptypes[1]))
+    ax.bar(x_33, bardata[2], color=colors[2],  
+           width=0.2, label='{}'.format(exptypes[2]))
+    plt.xticks([i for i in range(len(mnlist))],instrs,fontsize=10)
+
   elif len(exptypes) == 4:
-    ax.bar(x_41, bardata[0], color=colors[0],  width=0.2, label='{}_{}'.format(pres[0], exptypes[0]))
-    ax.bar(x_42, bardata[1], color=colors[1],  width=0.2, label='{}_{}'.format(pres[0], exptypes[1]))
-    ax.bar(x_43, bardata[2], color=colors[2],  width=0.2, label='{}_{}'.format(pres[0], exptypes[2]))
-    ax.bar(x_44, bardata[3], color=colors[3],  width=0.2, label='{}_{}'.format(pres[0], exptypes[3]))
+    ax.bar(x_41, bardata[0], color=colors[0],  
+           width=0.2, label='{}'.format(labeltype[0]))
+    ax.bar(x_42, bardata[1], color=colors[1],  
+           width=0.2, label='{}'.format(labeltype[1]))
+    ax.bar(x_43, bardata[2], color=colors[2],  
+           width=0.2, label='{}'.format(labeltype[2]))
+    ax.bar(x_44, bardata[3], color=colors[3],  
+           width=0.2, label='{}'.format(labeltype[3]))
+    plt.xticks([i for i in range(len(mnlist))],instrs,fontsize=10)
+
   else:
     print('no suitable exptypes length')
     exit()
-  plt.tight_layout()
-  plt.xlabel("Bandwidth (GB/s)",fontsize=12)
-  plt.ylabel("matrix size",fontsize=12)
-  
+#   plt.tight_layout()
+  plt.xlabel("Intruments",fontsize=12)
+  plt.ylabel("Bandwidth (GB/s)",fontsize=12)
+
+  plt.legend(loc='upper left')
+  plt.minorticks_on()
+  plt.grid(which='both', color='white', linewidth='0.3')
+  plt.savefig('Bandwidth_{}.pdf'.format(precision),bbox_inches='tight')
+
+def timeplot(df, mnlist, exptypes, precision='double'):
+#   plt.figure(figsize=(4,3),dpi=150)
+  fig,ax = plt.subplots()
+  ax.set_facecolor('lightgrey')
+  ax.set_alpha(0.0001)
+  x_11 =[2*i for i in range(len(mnlist))]
+  p_1 = np.array(x_11).T
+
+  x_21 =[2*i-.15 for i in range(len(mnlist))] 
+  x_22 =[2*i+.15 for i in range(len(mnlist))] 
+  p_2 = np.array([x_21,x_22]).T
+
+  x_31 =[2*i-.3 for i in range(len(mnlist))]
+  x_32 =[2*i for i in range(len(mnlist))]
+  x_33 =[2*i+.3 for i in range(len(mnlist))]
+  p3 = np.array([x_31,x_32,x_33]).T
+
+  x_41 =[2*i-.45 for i in range(len(mnlist))]
+  x_42 =[2*i-.15 for i in range(len(mnlist))]
+  x_43 =[2*i+.15 for i in range(len(mnlist))]
+  x_44 =[2*i+.45 for i in range(len(mnlist))]
+  p_4 = np.array([x_41,x_42,x_43,x_44]).T
+  colors = ['orange','blue','darkgreen','magenta']
+  for i in range(len(mnlist)):
+    selectidx = (df.M == mnlist[i][0]) & (df.N == mnlist[i][1]) \
+    & (df.pres == precision)
+    tmpdf = df[selectidx]
+    bxtimeip = getboxplottimeinput(tmpdf,exptypes)
+    if len(exptypes) == 1:
+      pass
+    elif len(exptypes) == 2:
+      bp = plt.boxplot(bxtimeip,positions = p_2[i], widths = 0.3)
+      plt.yscale('log')
+      j=0
+      for idx,b in enumerate(bp['boxes']):
+        b.set_color(colors[j%len(exptypes)])
+        bp['medians'][idx].set_color(colors[j%len(exptypes)])
+        j+=1
+    elif len(exptypes) == 3:
+      pass
+    elif len(exptypes) == 4:
+      bp = plt.boxplot(bxtimeip,positions = p_4[i], widths = 0.2)
+      plt.yscale('log')
+      j=0
+      for idx,b in enumerate(bp['boxes']):
+        b.set_color(colors[j%len(exptypes)])
+        bp['medians'][idx].set_color(colors[j%len(exptypes)])
+        j+=1
+  # after for loop
+  j=0
+  for b in bp['boxes']:
+    if j < len(exptypes):
+      b.set_label(labeltype[j])
+      j += 1
+
+  xtick = instrs
+  plt.xticks([2*i for i in range(len(mnlist))],xtick,fontsize=10)
+#   plt.tight_layout()
+  plt.xlabel("Instruments",fontsize=12)
+  plt.ylabel("Time(s)",fontsize=12)
   plt.legend()
   plt.minorticks_on()
-  plt.show()
-  # c=['r','g','b']
-  # for idx,exp in enumerate(exptypes):
-  #   if exp in set(df.exptype):
-  #     print('ploting ',exp)
-  #     ax = bandplot(df,exp,c[idx])
-  # ax.xaxis.set_tick_params(labelsize=8)
-  # ax.yaxis.set_tick_params(labelsize=8)
-  # ax.set_xticklabels(labels=[str(int(x)) for x in sorted(set(df.N))])
-  # plt.grid(True, 'both')
-  # plt.xlabel("M = N",fontsize=10)
-  # plt.ylabel("Bandwith(GB/s)",fontsize=10)
-  # plt.legend(fontsize=7)
-  # plt.savefig("plots/{}_bandwith.pdf".format("-".join(exptypes)),bbox_inches='tight')
-  # plt.show()
+  plt.grid(which='both', color='white', linewidth='0.3')
+  plt.savefig('Time_{}.pdf'.format(precision),bbox_inches='tight')
 
 
+mnlist = [[2000,14000],[5000,10000],[5000,25000],[5000,20000],[8000,80000],[35000,70000]]  
+searchfolder = 'log'
+precision = 'double'
+exptypes = ['amd','cascadelake','nec','a100']
 
-# %%
-
-# def plotnvidia(exptypes):
-#   df = pd.DataFrame()
-#   for f in os.listdir('log'):
-#     for ep in exptypes:
-#       if f.endswith(ep+'.txt'):
-#         resmap = extractfile('log/'+f)
-#         df = addmaptodf(df, resmap)
-#   baseplot(df, ['P100','V100'])
-#   basetmplot(df,['P100','V100'])
-#   basebandplot(df, ['P100','V100'])
-
-# def plotamd():
-#   pass
-
-
-# def plotintel(exptypes):
-#   df = pd.DataFrame()
-#   for f in os.listdir('log'):
-#     for ep in exptypes:
-#       if f.endswith(ep + '.txt'):
-#         resmap = extractfile('log/'+f)
-#         df = addmaptodf(df, resmap)
-#   baseplot(df, exptypes)
-#   basetmplot(df,exptypes)
-
-# plotnvidia(['P100','V100'])
-
-
-transpose = sys.argv[1]
-if transpose == 'Notrans':
-  mnlist = [[5000,10000],[5000,20000], \
-  [5000,25000],[8000,80000]]
-else:
-  mnlist = [[10000,5000],[20000,5000], \
-  [25000,5000],[80000,8000]]
-
-searchfolder = sys.argv[2]
-
-precision = sys.argv[3]
-
-exptypes = sys.argv[4:]
-
-print("genrating plots for ", transpose, " mnlist ", mnlist)
+print("genrating dimension size: ", mnlist)
 print("searching folder: ", searchfolder)
 print("precision: ", precision)
-assert(precision == 'double' or precision == 'single' or precision == 'all')
-print("exptype is ", exptypes)
-
+print("exptypes: ", exptypes)
 
 df = pd.DataFrame()
 for k,v in mnlist:
@@ -215,38 +196,9 @@ for k,v in mnlist:
     for f in os.listdir(searchfolder):
       if f.endswith(exp+'.txt') and f.startswith("M{}N{}".format(k,v)):
         fpath = searchfolder + '/' + f
-        resmap = extractfile(fpath)
-        df = addmaptodf(df, resmap)
-for exp in exptypes:
-  if exp not in set(df.exptype):
-    print("we have not results for ", exp, ", please check and relaunch.")
-    exit()
-basebandplot(df, mnlist, exptypes, precision)
+        resmapdf = extractfile(fpath)
+        df = df.append(resmapdf,ignore_index=True)
 
-
-# %%
-
-"""
-plt.figure(figsize=(4,3),dpi=150)
-ax = boxplot('V100')
-# ax = boxplot('P100')
-ax.xaxis.set_tick_params(labelsize=8)
-ax.yaxis.set_tick_params(labelsize=8)
-ax.set_xticklabels(labels=[str(int(x)) for x in sorted(set(df.N))])
-plt.grid(True, 'both')
-plt.xlabel("M = N",fontsize=10)
-plt.ylabel("Gflop/s",fontsize=10)
-plt.legend(fontsize=8)
+bandwidthplot(df, mnlist, exptypes)
+timeplot(df, mnlist, exptypes)
 plt.show()
-plt.figure(figsize=(4,3),dpi=150)
-# ax = boxplot('V100')
-ax = boxplot('P100')
-ax.xaxis.set_tick_params(labelsize=8)
-ax.yaxis.set_tick_params(labelsize=8)
-ax.set_xticklabels(labels=[str(int(x)) for x in sorted(set(df.N))])
-plt.grid(True, 'both')
-plt.xlabel("M = N",fontsize=10)
-plt.ylabel("Gflop/s",fontsize=10)
-plt.legend(fontsize=8)
-plt.show()
-"""
