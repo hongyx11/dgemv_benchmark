@@ -102,9 +102,11 @@ void naive_impl(real_t *A, real_t* x, real_t *y, int m, int n){
 
 void Initdata_cpu(real_t *A, real_t* x, real_t *y, int m, int n){
   memset(y, 0, sizeof(real_t) * m);
+  #pragma omp parallel for
   for(int i=0; i<n; i++){
     x[i] = (real_t)rand() / (real_t)RAND_MAX;
   }
+  #pragma omp parallel for
   for(int i=0; i<m; i++){
     for(int j=0; j<n; j++){
       long tmp = (long)i * (long)n + (long)j;
@@ -116,6 +118,7 @@ void Initdata_cpu(real_t *A, real_t* x, real_t *y, int m, int n){
 
 double checkcorrectness(real_t *y, real_t *ynaive, int dim, int sumdim){
   double *rerr = (double*)malloc(sizeof(double)*dim);
+  #pragma omp parallel for
   for(int i=0; i<dim; i++){
     rerr[i] =fabs(y[i] - ynaive[i]) / fabs(ynaive[i]);
   }
