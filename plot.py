@@ -9,7 +9,7 @@ import sys
 global variable
 """
 instrs = ['SCEXAO','MICADO [1]','MICADO [2]','MAVIS','MAORY','EPICS']
-labeltype = ['AMD Epyc Rome','Intel Cascade Lake','NEC SX-Aurora 20B','NVIDIA A100']
+labeltype = ['AMD Epyc Rome','Intel Cascade Lake','NEC SX-Aurora 20B','NVIDIA A100 40GB']
 
 #%%
 def extractfile(filename):
@@ -108,6 +108,7 @@ def bandwidthplot(df, mnlist, exptypes, precision='double'):
 #   plt.tight_layout()
   plt.xlabel("Instruments",fontsize=12)
   plt.ylabel("Bandwidth (GB/s)",fontsize=12)
+  plt.yticks(np.arange(0, 2000, 250))
 
   plt.legend(loc='upper left')
   plt.minorticks_on()
