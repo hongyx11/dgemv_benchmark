@@ -1,15 +1,8 @@
-#%%
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import sys
-
-"""
-global variable
-"""
-instrs = ['SCEXAO','MICADO [1]','MICADO [2]','MAVIS','MAORY','EPICS']
-labeltype = ['AMD Epyc Rome','Intel Cascade Lake','NEC SX-Aurora 20B','NVIDIA A100 40GB']
 
 #%%
 def extractfile(filename):
@@ -46,7 +39,14 @@ def getboxplottimeinput(df, exptypes):
     ret.append(df[df.exptype == exp].time.to_numpy().tolist())
   return ret
 
-def bandwidthplot(df, mnlist, exptypes, precision='double'):
+def selectdata(df, m, n, explist, pres='double'):
+  idx = df.exptype == explist[0]
+  for exp in explist:
+    idx = idx | (df.exptype == exp)
+  idx = (df.M == m) & (df.N == n) & idx &(df.pres == pres)
+  return df[idx]
+
+def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
   bardata = [[] for _ in range(len(exptypes))]
   for idx,exp in enumerate(exptypes):
     for mnidx in range(len(mnlist)):
@@ -106,16 +106,16 @@ def bandwidthplot(df, mnlist, exptypes, precision='double'):
     print('no suitable exptypes length')
     exit()
 #   plt.tight_layout()
-  plt.xlabel("Instruments",fontsize=12)
+  plt.xlabel("Intruments",fontsize=12)
   plt.ylabel("Bandwidth (GB/s)",fontsize=12)
   plt.yticks(np.arange(0, 2000, 250))
 
   plt.legend(loc='upper left')
   plt.minorticks_on()
   plt.grid(which='both', color='white', linewidth='0.3')
-  plt.savefig('Bandwidth_{}.pdf'.format(precision),bbox_inches='tight')
+  plt.savefig('plots/bandwidth/Bandwidth_{}.pdf'.format(precision),bbox_inches='tight')
 
-def timeplot(df, mnlist, exptypes, precision='double'):
+def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
 #   plt.figure(figsize=(4,3),dpi=150)
   fig,ax = plt.subplots()
   ax.set_facecolor('lightgrey')
@@ -178,29 +178,16 @@ def timeplot(df, mnlist, exptypes, precision='double'):
   plt.legend()
   plt.minorticks_on()
   plt.grid(which='both', color='white', linewidth='0.3')
-  plt.savefig('Time_{}.pdf'.format(precision),bbox_inches='tight')
+  plt.savefig('plots/bandwidth/Time_{}.pdf'.format(precision),bbox_inches='tight')
 
-# these are the dimension we are lookging into
-# it matches the order of instrs, ['SCEXAO','MICADO [1]','MICADO [2]','MAVIS','MAORY','EPICS']
-mnlist = [[2000,10000],[5000,10000],[5000,25000],[5000,20000],[8000,80000],[35000,70000]]  
-searchfolder = 'log'
-precision = 'double'
-exptypes = ['amd','cascadelake','NEC_20B','a100']
-
-print("genrating dimension size: ", mnlist)
-print("searching folder: ", searchfolder)
-print("precision: ", precision)
-print("exptypes: ", exptypes)
-
-df = pd.DataFrame()
-for k,v in mnlist:
-  for exp in exptypes:
-    for f in os.listdir(searchfolder):
-      if f.endswith(exp+'.txt') and f.startswith("M{}N{}".format(k,v)):
-        fpath = searchfolder + '/' + f
-        resmapdf = extractfile(fpath)
-        df = df.append(resmapdf,ignore_index=True)
-
-bandwidthplot(df, mnlist, exptypes)
-timeplot(df, mnlist, exptypes)
-plt.show()
+  
+def loaddatafromtxt(mnlist, exptypes, searchfolder):
+  df = pd.DataFrame()
+  for k,v in mnlist:
+    for exp in exptypes:
+      for f in os.listdir(searchfolder):
+        if f.endswith(exp+'.txt') and f.startswith("M{}N{}".format(k,v)):
+          fpath = searchfolder + '/' + f
+          resmapdf = extractfile(fpath)
+          df = df.append(resmapdf,ignore_index=True)
+  return df
