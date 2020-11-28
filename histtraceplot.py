@@ -14,7 +14,7 @@ instrs_plt = ['SCEXAO','MICADO1','MICADO2','MAVIS','MAORY','EPICS']
 labeltype = ['Intel Cascade Lake','NEC SX-Aurora 20B','NVIDIA A100 40GB']
 mnlist = [[2000,14000],[5000,10000],[5000,25000],[5000,20000],\
           [8000,80000],[35000,70000]]
-exptypes = ['cascadelake','nec','a100']
+exptypes = ['cascadelake','NEC_20B','a100']
 searchfolder = 'log'
 
 if not os.path.exists('plots'):
