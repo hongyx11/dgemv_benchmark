@@ -1,4 +1,5 @@
-
+#BLAS_DIR=/home/ltaiefh/bench/blis/install
+BLAS_DIR=/home/ltaiefh/codes/kblas-cpu-amd/amd-blis
 CC=gcc -std=gnu99
 NVCC=nvcc
 
@@ -93,24 +94,24 @@ amd:
 	mkdir -p bin
 	mkdir -p log
 	mkdir -p plots
-	${CC} -O3 dgemv.c  \
-	-DUSE_AMD -DUSE_DOUBLE -I/home/u00u5p7jc6nCm4kIfG357/codes/OpenBLAS-amd \
-	-o bin/amddouble -L/home/u00u5p7jc6nCm4kIfG357/codes/OpenBLAS-amd \
-	-lopenblas -lgomp -lpthread -lm -ldl
+	${CC} -O3 -fopenmp dgemv.c  \
+	-DUSE_AMD -DUSE_DOUBLE -I${BLAS_DIR}/include \
+	-o bin/amddouble -L${BLAS_DIR}/lib \
+	-lblis-mt -lgomp -lpthread -lm -ldl
 
-	${CC} -O3 dgemv.c \
-	-DUSE_AMD -I/home/u00u5p7jc6nCm4kIfG357/codes/OpenBLAS-amd \
-	-o bin/amdsingle -L/home/u00u5p7jc6nCm4kIfG357/codes/OpenBLAS-amd \
-	-lopenblas -lgomp -lpthread -lm -ldl
+	${CC} -O3 -fopenmp dgemv.c \
+	-DUSE_AMD -I${BLAS_DIR}/include \
+	-o bin/amdsingle -L${BLAS_DIR}/lib \
+	-lblis-mt -lgomp -lpthread -lm -ldl
 
-	${CC} -O3 dgemv_transpose.c  \
-	-DUSE_AMD -DUSE_DOUBLE -I/home/u00u5p7jc6nCm4kIfG357/codes/OpenBLAS-amd \
-	-o bin/amddouble_transpose -L/home/u00u5p7jc6nCm4kIfG357/codes/OpenBLAS-amd \
-	-lopenblas -lgomp -lpthread -lm -ldl
+	${CC} -O3 -fopenmp dgemv_transpose.c  \
+	-DUSE_AMD -DUSE_DOUBLE -I${BLAS_DIR}/include \
+	-o bin/amddouble_transpose -L${BLAS_DIR}/lib \
+	-lblis-mt -lgomp -lpthread -lm -ldl
 
-	${CC} -O3 dgemv_transpose.c \
-	-DUSE_AMD -I/home/u00u5p7jc6nCm4kIfG357/codes/OpenBLAS-amd \
-	-o bin/amdsingle_transpose -L/home/u00u5p7jc6nCm4kIfG357/codes/OpenBLAS-amd \
-	-lopenblas -lgomp -lpthread -lm -ldl
+	${CC} -O3 -fopenmp dgemv_transpose.c \
+	-DUSE_AMD -I${BLAS_DIR}/include \
+	-o bin/amdsingle_transpose -L${BLAS_DIR}/lib \
+	-lblis-mt -lgomp -lpthread -lm -ldl
 
 all: intel nvidia amd nec

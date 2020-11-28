@@ -22,8 +22,14 @@
 #include <cublas_v2.h>
 #endif
 
-#if defined(USE_NEC) || defined(USE_AMD)
+#if defined(USE_NEC)
 #include <cblas.h>
+#endif
+
+#if defined(USE_AMD)
+#include <blis.h>
+//#include <cblas.h>
+void bli_thread_set_num_threads( dim_t n_threads );
 #endif
 
 #ifdef USE_DOUBLE
@@ -224,13 +230,13 @@ int main(int argc, const char* argv[])
       #ifdef USE_NEC
           printf(" 2) use nec, nlc use %d threads and double precision on %s.\n\n", threads, machinename);
       #else
-          printf(" 2) use amd, openblas use %d threads and double precision on %s.\n\n", threads, machinename);
+          printf(" 2) use amd, blis use %d threads and double precision on %s.\n\n", threads, machinename);
       #endif
   #else
       #ifdef USE_NEC
           printf(" 2) use nec, nlc use %d threads and single precision on %s.\n\n", threads, machinename);
       #else
-          printf(" 2) use amd, openblas use %d threads and single precision on %s.\n\n", threads, machinename);
+          printf(" 2) use amd, blis use %d threads and single precision on %s.\n\n", threads, machinename);
       #endif
   #endif
 #endif 
