@@ -71,10 +71,11 @@ def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
   x_42 =[i-.1 for i in range(len(mnlist))]
   x_43 =[i+.1 for i in range(len(mnlist))]
   x_44 =[i+.3 for i in range(len(mnlist))]
-  colors = ['orange','blue','darkgreen','magenta']
+  #colors = ['orange','blue','darkgreen','magenta']
+  colors = ['blue','darkgreen','magenta']
   if len(exptypes) == 1:
     ax.bar(x_11, bardata[0], color=colors[0],  
-           width=0.2, label='{}'.format(exptypes[0]))
+           width=0.2, label='{}'.format(labeltype[0]))
   elif len(exptypes) == 2:
     ax.bar(x_21, bardata[0], color=colors[0],  
            width=0.2, label='{}'.format(labeltype[0]))
@@ -84,11 +85,11 @@ def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
 
   elif len(exptypes) == 3:
     ax.bar(x_31, bardata[0], color=colors[0],  
-           width=0.2, label='{}'.format(exptypes[0]))
+           width=0.2, label='{}'.format(labeltype[0]))
     ax.bar(x_32, bardata[1], color=colors[1],  
-           width=0.2, label='{}'.format(exptypes[1]))
+           width=0.2, label='{}'.format(labeltype[1]))
     ax.bar(x_33, bardata[2], color=colors[2],  
-           width=0.2, label='{}'.format(exptypes[2]))
+           width=0.2, label='{}'.format(labeltype[2]))
     plt.xticks([i for i in range(len(mnlist))],instrs,fontsize=10)
 
   elif len(exptypes) == 4:
@@ -130,14 +131,15 @@ def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
   x_31 =[2*i-.3 for i in range(len(mnlist))]
   x_32 =[2*i for i in range(len(mnlist))]
   x_33 =[2*i+.3 for i in range(len(mnlist))]
-  p3 = np.array([x_31,x_32,x_33]).T
+  p_3 = np.array([x_31,x_32,x_33]).T
 
   x_41 =[2*i-.45 for i in range(len(mnlist))]
   x_42 =[2*i-.15 for i in range(len(mnlist))]
   x_43 =[2*i+.15 for i in range(len(mnlist))]
   x_44 =[2*i+.45 for i in range(len(mnlist))]
   p_4 = np.array([x_41,x_42,x_43,x_44]).T
-  colors = ['orange','blue','darkgreen','magenta']
+  #colors = ['orange','blue','darkgreen','magenta']
+  colors = ['blue','darkgreen','magenta']
   for i in range(len(mnlist)):
     selectidx = (df.M == mnlist[i][0]) & (df.N == mnlist[i][1]) \
     & (df.pres == precision)
@@ -154,7 +156,14 @@ def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
         bp['medians'][idx].set_color(colors[j%len(exptypes)])
         j+=1
     elif len(exptypes) == 3:
-      pass
+      #pass
+      bp = plt.boxplot(bxtimeip,positions = p_3[i], widths = 0.2)
+      plt.yscale('log')
+      j=0
+      for idx,b in enumerate(bp['boxes']):
+        b.set_color(colors[j%len(exptypes)])
+        bp['medians'][idx].set_color(colors[j%len(exptypes)])
+        j+=1
     elif len(exptypes) == 4:
       bp = plt.boxplot(bxtimeip,positions = p_4[i], widths = 0.2)
       plt.yscale('log')
