@@ -301,6 +301,7 @@ int main(int argc, const char* argv[])
 #if defined(USE_INTEL) || defined(USE_NEC) || defined(USE_AMD)
 for(int nr=0; nr<nruns+warmup; nr++){
   double stime = 0.0, etime = 0.0, executiontime = 0.0;
+  Initdata_cpu(A, x, y, m, n);
   stime = gettime();
 #ifdef USE_DOUBLE
   cblas_dgemv(CblasColMajor, CblasNoTrans, 
