@@ -47,7 +47,8 @@ mnlist = [
 
 transpose='Notrans'
 searchfolder = 'log'
-precision = 'double'
+#precision = 'double'
+precision = 'single'
 exptypes = ['a100']
 
 print("genrating plots for ", transpose, " mnlist ", mnlist)

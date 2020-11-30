@@ -39,14 +39,16 @@ def getboxplottimeinput(df, exptypes):
     ret.append(df[df.exptype == exp].time.to_numpy().tolist())
   return ret
 
-def selectdata(df, m, n, explist, pres='double'):
+#def selectdata(df, m, n, explist, pres='double'):
+def selectdata(df, m, n, explist, pres='single'):
   idx = df.exptype == explist[0]
   for exp in explist:
     idx = idx | (df.exptype == exp)
   idx = (df.M == m) & (df.N == n) & idx &(df.pres == pres)
   return df[idx]
 
-def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
+#def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
+def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='single'):
   bardata = [[] for _ in range(len(exptypes))]
   for idx,exp in enumerate(exptypes):
     for mnidx in range(len(mnlist)):
@@ -116,7 +118,8 @@ def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
   plt.grid(which='both', color='white', linewidth='0.3')
   plt.savefig('plots/bandwidth/Bandwidth_{}.pdf'.format(precision),bbox_inches='tight')
 
-def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
+#def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='double'):
+def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='single'):
 #   plt.figure(figsize=(4,3),dpi=150)
   fig,ax = plt.subplots()
   ax.set_facecolor('lightgrey')
