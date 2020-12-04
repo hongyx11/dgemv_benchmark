@@ -73,8 +73,8 @@ def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='single'):
   x_42 =[i-.1 for i in range(len(mnlist))]
   x_43 =[i+.1 for i in range(len(mnlist))]
   x_44 =[i+.3 for i in range(len(mnlist))]
-  #colors = ['orange','blue','darkgreen','magenta']
-  colors = ['blue','darkgreen','magenta']
+  #colors = ['orange','blue','darkgreen','red']
+  colors = ['blue','darkgreen','red']
   if len(exptypes) == 1:
     ax.bar(x_11, bardata[0], color=colors[0],  
            width=0.2, label='{}'.format(labeltype[0]))
@@ -109,9 +109,9 @@ def bandwidthplot(df, mnlist, exptypes, labeltype, instrs, precision='single'):
     print('no suitable exptypes length')
     exit()
 #   plt.tight_layout()
-  plt.xlabel("Intruments",fontsize=12)
+  plt.xlabel("Instruments",fontsize=12)
   plt.ylabel("Bandwidth (GB/s)",fontsize=12)
-  plt.yticks(np.arange(0, 2000, 250))
+  plt.yticks(np.arange(0, 1800, 250))
 
   plt.legend(loc='upper left')
   plt.minorticks_on()
@@ -141,8 +141,8 @@ def timeplot(df, mnlist, exptypes, labeltype, instrs, precision='single'):
   x_43 =[2*i+.15 for i in range(len(mnlist))]
   x_44 =[2*i+.45 for i in range(len(mnlist))]
   p_4 = np.array([x_41,x_42,x_43,x_44]).T
-  #colors = ['orange','blue','darkgreen','magenta']
-  colors = ['blue','darkgreen','magenta']
+  #colors = ['orange','blue','darkgreen','red']
+  colors = ['blue','darkgreen','red']
   for i in range(len(mnlist)):
     selectidx = (df.M == mnlist[i][0]) & (df.N == mnlist[i][1]) \
     & (df.pres == precision)
