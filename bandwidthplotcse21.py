@@ -11,17 +11,13 @@ global variable
 """
 instrs = ['SCEXAO','MICADO [1]','MICADO [2]','MAVIS','MAORY','EPICS']
 
-#labeltype = ['AMD Epyc Rome','Intel Cascade Lake','NEC SX-Aurora 20B','NVIDIA A100 40GB']
 labeltype = ['Intel Cascade Lake','NVIDIA A100 40GB','NEC SX-Aurora 20B']
 
 # these are the dimension we are lookging into
-# it matches the order of instrs, ['SCEXAO','MICADO [1]','MICADO [2]','MAVIS','MAORY','EPICS']
 mnlist = [[2000,10000],[5000,10000],[5000,25000],[5000,20000],[8000,80000],[35000,70000]]
 
 searchfolder = 'log'
-#precision = 'double'
 precision = 'single'
-#exptypes = ['amd','cascadelake','NEC_20B','a100']
 exptypes = ['cascadelake','a100','NEC_20B']
 
 print("genrating dimension size: ", mnlist)

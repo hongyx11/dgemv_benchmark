@@ -36,5 +36,5 @@ if not os.path.exists('plots/bandwidth'):
     os.makedirs('plots/bandwidth')
 
 bandwidthplot(df, mnlist, exptypes,labeltype,instrs)
-timeplot(df, mnlist, exptypes,labeltype, instrs)
+# timeplot(df, mnlist, exptypes,labeltype, instrs)
 plt.show()
