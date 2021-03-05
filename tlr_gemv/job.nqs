@@ -1,0 +1,86 @@
+#!/bin/bash
+#
+#
+#    -q a1_10AE
+#PBS -q a2_20B
+#
+#PBS -T necmpi
+#
+#PBS -l cpunum_job=2
+#
+#PBS -l elapstim_req=600
+#
+#PBS -l coresz_prc=0
+#
+#PBS --venode=8
+#PBS --venum-lhost=8
+#PBS --use-hca=1
+#
+#PBS -N test
+#
+#PBS -j o
+#
+#PBS -v NMPI_PREFIX=/usr/uhome/aurora/mpc/pub/NECmpi.dir/2.13.0
+#
+#PBS -v NMPI_DAEMON_PATH=${NMPI_PREFIX}/libexec/mpid
+#
+
+source ${NMPI_PREFIX}/bin/necmpivars.sh
+source /opt/nec/ve/nlc/2.1.0/bin/nlcvars.sh
+
+cd ${PBS_O_WORKDIR}
+
+BINARY=/mnt/scatefs_necd/esslg/Benchmarks/Kaust/tlr_gemv/necsingle
+SEP=/mnt/scatefs_necd/esslg/Benchmarks/Kaust/tlr_gemv/sep
+JOBID=$( echo "${PBS_JOBID}" | cut -d'.' -f1 | cut -d':' -f2 )
+
+NIT=5000
+NB=500
+NTHR=8
+NMPI=8
+NVE=8
+CASE=MAVIS
+
+#
+# N has to be multiple of 4 x NMPI and NB
+# M has to be multiple of 4 and NB
+#
+
+case ${CASE} in
+  SCEXAO)
+    N=14000
+    M=2000
+    ;;
+  MICADO1)
+    N=10000
+    M=5000
+    ;;
+  MICADO2)
+    N=25000
+    M=5000
+    ;;
+  MAVIS)
+    N=20000
+    M=5000
+    ;;
+  MAORY)
+    N=80000
+    M=8000
+    ;;
+  EPICS)
+    N=70000
+    M=35000
+    ;;
+  *)
+    echo "Test '${CASE}' case not supported"
+    exit 0
+    ;;
+esac
+
+export OMP_NUM_THREADS=${NTHR}
+
+export LOG="${CASE}_${NVE}VE_${M}_${N}_${NB}_${NMPI}MPI_${NTHR}OMP.${QUEUENAME}.${JOBID}.log"
+
+mpirun -genvlist LOG,OMP_NUM_THREADS -ve 0-$(( ${NVE} - 1 )) -np ${NMPI} ${SEP} ${BINARY} fixed ${M} ${N} ${NB} ${NIT} nec
+
+exit 0
